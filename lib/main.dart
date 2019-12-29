@@ -114,7 +114,6 @@ class _WeightScreenState extends State<WeightScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(weightButtons.length);
     return MaterialApp(
         home: Scaffold(
             appBar: AppBar(
@@ -136,7 +135,7 @@ class _WeightScreenState extends State<WeightScreen> {
                         onPressed: next ? () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => MainPane(weight)),
+                            MaterialPageRoute(builder: (context) => MainPane(wt:weight)),
                           );
                         }: null,
                         child: Text(
@@ -190,11 +189,9 @@ class _WeightScreenState extends State<WeightScreen> {
 }
 
 class MainPane extends StatefulWidget {
-  int weight;
+  final int wt;
 
-  MainPane(int w) {
-    weight = w;
-  }
+  MainPane({Key key, @required this.wt}) : super(key: key);
   
   @override
   MainPaneState createState() => MainPaneState();
@@ -271,13 +268,13 @@ class MainPaneState extends State<MainPane> {
                             color: Colors.white,
                             onPressed: () {
                               setState(() {
-                                TimeLineEntry add = TimeLineEntry("Adenosine (IV)", DateTime.now(), "${widget.weight * 0.1} mg");
+                                TimeLineEntry add = TimeLineEntry("Adenosine (IV)", DateTime.now(), "${widget.wt * 0.1} mg");
                                 entries.add(add);
                               });
                             },
                             child:Center(
                               child:Text(
-                              "${(0.1 * widget.weight / 3).toStringAsFixed(2)}",
+                              "${(0.1 * widget.wt / 3).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -338,13 +335,13 @@ class MainPaneState extends State<MainPane> {
                             color: Colors.white,
                             onPressed: () {
                               setState(() {
-                                TimeLineEntry add = TimeLineEntry("Amiodarone", DateTime.now(), "${widget.weight*5} mg");
+                                TimeLineEntry add = TimeLineEntry("Amiodarone", DateTime.now(), "${widget.wt*5} mg");
                                 entries.add(add);
                               });
                             },
                             child:Center(
                               child:Text(
-                              "${(5 * widget.weight / 50).toStringAsFixed(2)}",
+                              "${(5 * widget.wt / 50).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -421,12 +418,12 @@ class MainPaneState extends State<MainPane> {
                               width: 95,
                               height: 45,
                               child: RaisedButton(
-                                child: Text("0.6", style: TextStyle(fontSize: 20)),
-                                color: atropine == 0.6 ? Colors.blue: Colors.white,
-                                textColor: atropine == 0.6 ? Colors.white : Colors.grey,
+                                child: Text("0.06", style: TextStyle(fontSize: 20)),
+                                color: atropine == 0.06 ? Colors.blue: Colors.white,
+                                textColor: atropine == 0.06 ? Colors.white : Colors.grey,
                                 onPressed: () {
                                   setState(() {
-                                    atropine = 0.6;
+                                    atropine = 0.06;
                                   });
                                 },
                               )
@@ -453,13 +450,13 @@ class MainPaneState extends State<MainPane> {
                             color: Colors.white,
                             onPressed: () {
                               setState(() {
-                                TimeLineEntry add = TimeLineEntry("Amiodarone", DateTime.now(), "${widget.weight * atropine} mg");
+                                TimeLineEntry add = TimeLineEntry("Atropine", DateTime.now(), "${widget.wt * atropine} mg");
                                 entries.add(add);
                               });
                             },
                             child:Center(
                               child:Text(
-                              "${(atropine * widget.weight / 0.1).toStringAsFixed(2)}",
+                              "${(atropine * widget.wt / 0.1).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -519,13 +516,13 @@ class MainPaneState extends State<MainPane> {
                             color: Colors.white,
                             onPressed: () {
                               setState(() {
-                                TimeLineEntry add = TimeLineEntry("Amiodarone", DateTime.now(), "${widget.weight * 0.02} mg");
+                                TimeLineEntry add = TimeLineEntry("Amiodarone", DateTime.now(), "${widget.wt * 0.02} mg");
                                 entries.add(add);
                               });
                             },
                             child:Center(
                               child:Text(
-                              "${(0.02 * widget.weight / 0.1).toStringAsFixed(2)}",
+                              "${(0.02 * widget.wt / 0.1).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -585,13 +582,13 @@ class MainPaneState extends State<MainPane> {
                             color: Colors.white,
                             onPressed: () {
                               setState(() {
-                                TimeLineEntry add = TimeLineEntry("Calcium Chloride 10%", DateTime.now(), "${20 * widget.weight} mg");
+                                TimeLineEntry add = TimeLineEntry("Calcium Chloride 10%", DateTime.now(), "${20 * widget.wt} mg");
                                 entries.add(add);
                               });
                             },
                             child:Center(
                               child:Text(
-                              "${(20 * widget.weight / 100).toStringAsFixed(2)}",
+                              "${(20 * widget.wt / 100).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -651,13 +648,13 @@ class MainPaneState extends State<MainPane> {
                             color: Colors.white,
                             onPressed: () {
                               setState(() {
-                                TimeLineEntry add = TimeLineEntry("Epinephrine (IV/IOO)", DateTime.now(), "${0.01 * widget.weight} mg");
+                                TimeLineEntry add = TimeLineEntry("Epinephrine (IV/IOO)", DateTime.now(), "${0.01 * widget.wt} mg");
                                 entries.add(add);
                               });
                             },
                             child:Center(
                               child:Text(
-                              "${(0.01 * widget.weight / 0.1).toStringAsFixed(2)}",
+                              "${(0.01 * widget.wt / 0.1).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -827,7 +824,7 @@ class MainPaneState extends State<MainPane> {
                             },
                             child:Center(
                               child:Text(
-                              "${(dripButtons[0] * widget.weight * 60 / 1600).toStringAsFixed(2)}",
+                              "${(dripButtons[0] * widget.wt * 60 / 1600).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -989,7 +986,7 @@ class MainPaneState extends State<MainPane> {
                             },
                             child:Center(
                               child:Text(
-                              "${(dripButtons[1] * widget.weight * 60 / 200).toStringAsFixed(2)}",
+                              "${(dripButtons[1] * widget.wt * 60 / 200).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -1152,7 +1149,7 @@ class MainPaneState extends State<MainPane> {
                             },
                             child:Center(
                               child:Text(
-                              "${(dripButtons[2] * widget.weight * 60 / 20).toStringAsFixed(2)}",
+                              "${(dripButtons[2] * widget.wt * 60 / 20).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -1289,7 +1286,7 @@ class MainPaneState extends State<MainPane> {
                             },
                             child:Center(
                               child:Text(
-                              "${(dripButtons[3] * widget.weight * 60 / 4).toStringAsFixed(2)}",
+                              "${(dripButtons[3] * widget.wt * 60 / 4).toStringAsFixed(2)}",
                               style:TextStyle(fontSize: 30)
                           )))
                         )
@@ -1496,7 +1493,7 @@ class MainPaneState extends State<MainPane> {
                       height : MediaQuery.of(context).size.height,
                       child: Center(
                         child: Text(
-                          "${widget.weight} kg",
+                          "${widget.wt} kg",
                           style: TextStyle(fontSize: 35)
                         )
                       )
@@ -1556,7 +1553,7 @@ class MainPaneState extends State<MainPane> {
                       ),
                       child: Center(
                         child:Text(
-                        "Defibrillation (2 J/kg): ${widget.weight * 2} J",
+                        "Defibrillation (2 J/kg): ${widget.wt * 2} J",
                         style: TextStyle(fontSize: 30),
                       ))
                     ),
@@ -1573,7 +1570,7 @@ class MainPaneState extends State<MainPane> {
                       ),
                       child: Center(
                         child:Text(
-                        "Cardioversion (Synchronized) (0.5 J/kg): ${widget.weight / 2} J",
+                        "Cardioversion (Synchronized) (0.5 J/kg): ${widget.wt / 2} J",
                         style: TextStyle(fontSize: 30),
                       ))
                     ),
