@@ -1,5 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+enum CardType {
+  medication,
+  drip
+}
+
+class Medcard {
+  String name;
+  String notes;
+  double amount; //constant to divide from dosage (mg/ml or mcg/ml)
+  String unit;
+  List<double> dosages; //list of dosages for buttons (mg/kg or mcg/kg)
+  List<String> doseConds; // list of dosage conditions for each dosage (optional)
+  int currDose = 0; //index of current dosage corresponding to dosages list
+  CardType type;//medication or driptable
+  double min;
+  double max;
+
+  Medcard({this.name, this.notes, this.amount, this.unit, this.dosages, this.currDose, this.type, this.doseConds, this.min = -1, this.max = -1});
+}
+
+//TODO: Create interface for pharmacists to access firestore database and edit it
 
 void main() {
   runApp(MaterialApp(
@@ -12,18 +35,6 @@ class MyApp extends StatelessWidget {
     return WeightScreen();
   }
 }
-
-/*class WeightButton {
-  FlatButton button;
-  int weight;
-  int id;
-
-  WeightButton(FlatButton ib, int w, int i) {
-    button = ib;
-    weight = w;
-    id = i;
-  }
-}*/
 
 class WeightScreen extends StatefulWidget {
   @override
@@ -188,1117 +199,235 @@ class _WeightScreenState extends State<WeightScreen> {
   }
 }
 
+
+
 class MainPane extends StatefulWidget {
   final int wt;
-
-  MainPane({Key key, @required this.wt}) : super(key: key);
-  
+  final String hospital;
+  final int fleet;
+  final int cart;
+  MainPane({Key key, @required this.wt, @required this.hospital, @required this.fleet, @required this.cart}) : super(key: key);
   @override
   MainPaneState createState() => MainPaneState();
 }
 
 class MainPaneState extends State<MainPane> {
-  double atropine = 0.04;
-  int state = 0;
+  int state = 0; //driptable vs medications
   Set<TimeLineEntry> entries = Set<TimeLineEntry>();
-  List<double> dripButtons = [2.5, 2.5, 0.1, 20];
   ListView timeline;
-  GridView driptable;
-  GridView medications;
+  List<Container> driptable;
+  List<Container> medications;
+  List<Medcard> cards;
 
   MainPaneState() {
-    //driptable hard code:
+    cards = getCards();
+  }
 
-    //medications hard code:
+
+  Container toButton(double dose, Medcard mc) {//converts double value to a dosage button
+    return Container(
+      padding: EdgeInsets.all(5),
+      width: 80,
+      height: 45,
+      child: RaisedButton(
+        child: Text("$dose", style: TextStyle(fontSize: 20)),
+        color: mc.dosages[mc.currDose] == dose ? Colors.blue: Colors.white,
+        textColor: mc.dosages[mc.currDose] == dose ? Colors.white : Colors.grey,
+        onPressed: () {
+          setState(() {
+            mc.currDose = mc.dosages.indexOf(dose);
+          });
+        },
+      )
+    );
+  }
+  //TODO: Create function for filling in the cards list with data from the cloud firestore database
+  List<Medcard> getCards() {
+    return [];
 
   }
 
+  Container gencard(Medcard mc) {//converts Medcard to actual card interface
+    if (mc.type == CardType.drip) { //belongs in drip table
+      Widget titleBlock = Text(
+        "${mc.name}",
+        style: TextStyle(fontSize: 30)
+      );
+      Widget notes = Text(
+        "${mc.notes}",
+        style: TextStyle(fontSize: 20)
+      );
+
+      Widget doseButton = Container(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          children: <Widget>[
+            Text("RATE (ml/hour)"),
+            Container(
+              height: 130,
+              width: 130,
+              decoration: BoxDecoration(
+                border: Border.all()
+              ),
+              child: RaisedButton(
+                color: Colors.white,
+                onPressed: () {
+                  setState(() {
+                    TimeLineEntry add = TimeLineEntry("${mc.name}", DateTime.now(), "${mc.dosages[mc.currDose].toStringAsFixed(1)} ${mc.unit}");
+                    entries.add(add);
+                  });
+                },
+                child: Center(
+                  child: Text(
+                    "${(mc.dosages[mc.currDose] * widget.wt * 60 / mc.amount).toStringAsFixed(1)}",
+                    style: TextStyle(fontSize: 30)
+                  )
+                )
+              )
+            )
+          ],
+        ),
+      );
+      return Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: 3,
+          ),
+          borderRadius: (BorderRadius.all(Radius.circular(20)))
+        ),
+        child: Column(
+          children: [
+            titleBlock,
+            notes,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  child: Column(
+                    children: [
+                      Text("DOSE (mcg/kg/min)"),
+                      Row(
+                        children: [
+                          toButton(mc.dosages[0], mc),
+                          toButton(mc.dosages[1], mc),
+                          toButton(mc.dosages[2], mc),
+                        ]
+                      ),
+                      Row(
+                        children: [
+                          toButton(mc.dosages[3], mc),
+                          toButton(mc.dosages[4], mc),
+                          toButton(mc.dosages[5], mc),
+                        ]
+                      ),
+                    ]
+                  )
+                ),
+                doseButton,
+              ]
+            )
+          ]
+        )
+      );
+    }
+    else {//belongs in medication table
+      Widget titleBlock = Text("${mc.name}",
+        style: TextStyle(fontSize: 30));
+      Widget notes = Text(
+        "${mc.notes}",
+        style: TextStyle(fontSize: 18)
+      );
+      List<Container> buttons = [];
+      for (int i = 0; i < mc.dosages.length; ++i) {
+        buttons.add(toButton(mc.dosages[i], mc));
+      }
+      Widget doseButton = Container(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          children: <Widget>[
+            Text("RATE (ml/hour)"),
+            Container(
+              height: 130,
+              width: 130,
+              decoration: BoxDecoration(
+                border: Border.all()
+              ),
+              child: RaisedButton(
+                color: Colors.white,
+                onPressed: () {
+                  setState(() {
+                    TimeLineEntry add = TimeLineEntry("${mc.name}", DateTime.now(), "${mc.dosages[mc.currDose].toStringAsFixed(1)} ${mc.unit}");
+                    entries.add(add);
+                  });
+                },
+                child: Center(
+                  child: Text(
+                    "${(mc.dosages[mc.currDose] * widget.wt / mc.amount).toStringAsFixed(1)}",
+                    style: TextStyle(fontSize: 30)
+                  )
+                )
+              )
+            )
+          ],
+        ),
+      );
+      return Container(
+        decoration: BoxDecoration(
+          border: Border.all(width: 3),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20)
+          )
+        ),
+        child: Column(
+          children: [
+            titleBlock,
+            notes,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children:[
+                      Text("Dose (${mc.unit}/kg)"),
+                      Row(
+                        children:buttons
+                      )
+                    ]
+                  )
+                ),
+                doseButton
+              ]
+            )
+          ]
+        )
+      );
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+    for (int i = 0; i < cards.length; ++i) {
+      if (cards[i].type == CardType.drip) {
+        driptable.add(gencard(cards[i]));
+      }
+      else {
+        medications.add(gencard(cards[i]))
+      }
+    }
     //driptable hard code:
-    medications = GridView.count(
+    GridView medGV = GridView.count(
       childAspectRatio: 1.9,
       crossAxisCount: 2,
-      children:[
-        //Adenosine (IV)
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Adenosine (IV)",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "3mg/ml",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:[
-                        Text("NOTES"),
-                        Text("0.1 mg/kg, 6mg MAX", style:TextStyle(fontSize: 20)),
-                        Text("Rapid IV Push \nLower dose for heart transplant \nor central line", style:TextStyle(fontSize: 16)),
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Adenosine (IV)", DateTime.now(), "${widget.wt * 0.1} mg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(0.1 * widget.wt / 3).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-
-        //Amiodarone
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Amiodarone",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "50 mg/ml",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:[
-                        Text("NOTES"),
-                        Text("5 mg/kg, 190mg", style:TextStyle(fontSize: 20)),
-                        Text("IV Push or infusion\nMonitor ECG, HR, BP", style:TextStyle(fontSize: 16)),
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Amiodarone", DateTime.now(), "${widget.wt*5} mg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(5 * widget.wt / 50).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-        //Atropine (ETT)
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Atropine (ETT)",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "0.1 mg/ml",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:[
-                        Text("Dose (mg/kg)"),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 95,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("0.04", style: TextStyle(fontSize: 20)),
-                                color: atropine == 0.04 ? Colors.blue: Colors.white,
-                                textColor: atropine == 0.04 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    atropine = 0.04;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 95,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("0.05", style: TextStyle(fontSize: 20)),
-                                color: atropine == 0.05 ? Colors.blue: Colors.white,
-                                textColor: atropine == 0.05 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    atropine = 0.05;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 95,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("0.06", style: TextStyle(fontSize: 20)),
-                                color: atropine == 0.06 ? Colors.blue: Colors.white,
-                                textColor: atropine == 0.06 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    atropine = 0.06;
-                                  });
-                                },
-                              )
-                            ),
-                          ]
-                        ),
-                        Text("NOTES"),
-                        Text("May repeat dose 1x", style:TextStyle(fontSize: 18)),
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Atropine", DateTime.now(), "${widget.wt * atropine} mg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(atropine * widget.wt / 0.1).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-        //Atropine (IV/IO)
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Atropine (IV/IO)",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "0.1 mg/ml",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:[
-                        Text("NOTES"),
-                        Text("0.02 mg/kg, 0.76mg", style:TextStyle(fontSize: 20)),
-                        Text("May repeat dose x1", style:TextStyle(fontSize: 16)),
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Amiodarone", DateTime.now(), "${widget.wt * 0.02} mg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(0.02 * widget.wt / 0.1).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-        //Calcium Chloride 10%
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Calcium Chloride 10%",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "100 mg/ml",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:[
-                        Text("NOTES"),
-                        Text("20 mg/kg, 760mg", style:TextStyle(fontSize: 20)),
-                        Text("Slow IV Push\nDilute 1:1 with sterile water", style:TextStyle(fontSize: 16)),
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Calcium Chloride 10%", DateTime.now(), "${20 * widget.wt} mg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(20 * widget.wt / 100).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-        //Epinephrine (IV/IOO)
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Epinephrine (IV/IOO)",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "0.1 mg/ml (1:10,000)",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children:[
-                        Text("NOTES"),
-                        Text("0.01 mg/kg, 0.38mg", style:TextStyle(fontSize: 20)),
-                        Text("760 mg\nSlow IV Push", style:TextStyle(fontSize: 18)),
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Epinephrine (IV/IOO)", DateTime.now(), "${0.01 * widget.wt} mg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(0.01 * widget.wt / 0.1).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-
-      ]
+      children:medications
     );
 
-    driptable = GridView.count(
+    GridView dripGV = GridView.count(
       childAspectRatio:1.9,
       crossAxisCount: 2,
-      children:[
-
-        //Dopamine
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Dopamine",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "400 mg/250 ml in DSW (1600 mcg/ml)",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      children:[
-                        Text("DOSE (mcg/kg/min)"),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("2.5", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[0] == 2.5 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[0] == 2.5 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[0] = 2.5;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("5.0", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[0] == 5 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[0] == 5 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[0] = 5;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("7.5", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[0] == 7.5 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[0] == 7.5 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[0] = 7.5;
-                                  });
-                                },
-                              )
-                            ),
-                          ]
-                        ),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("10", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[0] == 10 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[0] == 10 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[0] = 10;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("15", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[0] == 15 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[0] == 15 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[0] = 15;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("20", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[0] == 20 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[0] == 20 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[0] = 20;
-                                  });
-                                },
-                              )
-                            ),
-                          ]
-                        )
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Dopamine", DateTime.now(), "${dripButtons[0].toStringAsFixed(1)} mcg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(dripButtons[0] * widget.wt * 60 / 1600).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-
-        //Dobutamine
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Dobutamine",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "500 mg/250 ml in DSW (2000 mcg/ml)",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      children:[
-                        Text("DOSE (mcg/kg/min)"),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("2.5", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[1] == 2.5 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[1] == 2.5 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[1] = 2.5;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("5.0", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[1] == 5 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[1] == 5 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[1] = 5;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("7.5", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[1] == 7.5 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[1] == 7.5 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[1] = 7.5;
-                                  });
-                                },
-                              )
-                            ),
-                          ]
-                        ),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("10", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[1] == 10 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[1] == 10 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[1] = 10;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("15", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[1] == 15 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[1] == 15 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[1] = 15;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("20", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[1] == 20 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[1] == 20 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[1] = 20;
-                                  });
-                                },
-                              )
-                            ),
-                          ]
-                        )
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Dobutamine", DateTime.now(), "${dripButtons[1].toStringAsFixed(1)} mcg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(dripButtons[1] * widget.wt * 60 / 200).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-
-
-        //Epinephrine
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Epinephrine",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "1 mg /100 ml in DSW (20 mcg/ml)",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      children:[
-                        Text("DOSE (mcg/kg/min)"),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("0.1", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[2] == 0.1 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[2] == 0.1 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[2] = 0.1;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("0.2", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[2] == 0.2 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[2] == 0.2 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[2] = 0.2;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("0.4", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[2] == 0.4 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[2] == 0.4 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[2] = 0.4;
-                                  });
-                                },
-                              )
-                            ),
-                          ]
-                        ),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("0.5", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[2] == 0.5 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[2] == 0.5 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[2] = 0.5;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("0.8", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[2] == 0.8 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[2] == 0.8 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[2] = 0.8;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("1.0", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[2] == 1 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[2] == 1 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[2] = 1;
-                                  });
-                                },
-                              )
-                            ),
-                          ]
-                        )
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Epinephrine", DateTime.now(), "${dripButtons[2].toStringAsFixed(1)} mcg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(dripButtons[2] * widget.wt * 60 / 20).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-
-        //Lidocaine
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 3,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(20)
-            )
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Lidocaine",
-                style: TextStyle(fontSize: 30)
-              ),
-              Text(
-                "2 mg /500 ml in DSW (4 mcg/ml; 0.4%)",
-                style: TextStyle(fontSize: 20)
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Column(
-                      children:[
-                        Text("DOSE (mcg/kg/min)"),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("20", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[3] == 20 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[3] == 20 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[3] = 20;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("30", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[3] == 30 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[3] == 30 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[3] = 30;
-                                  });
-                                },
-                              )
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("40", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[3] == 40? Colors.blue: Colors.white,
-                                textColor: dripButtons[3] == 40 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[3] = 40;
-                                  });
-                                },
-                              )
-                            ),
-                          ]
-                        ),
-                        Row(
-                          children:[
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: 80,
-                              height: 45,
-                              child: RaisedButton(
-                                child: Text("50", style: TextStyle(fontSize: 20)),
-                                color: dripButtons[3] == 50 ? Colors.blue: Colors.white,
-                                textColor: dripButtons[3] == 50 ? Colors.white : Colors.grey,
-                                onPressed: () {
-                                  setState(() {
-                                    dripButtons[3] = 50;
-                                  });
-                                },
-                              )
-                            ),
-                            Center(
-                              child:Text(
-                              "Patients with\n SEVERE CHF: \nLower diffusion rate",
-                              style: TextStyle(fontSize: 18)
-                            ))
-                          ]
-                        )
-                      ]
-                    )
-                  ),
-                  Container(
-                    padding:EdgeInsets.all(10),
-                    child:Column(
-                      children:[
-                        Text("RATE (ml/hour)"),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            border: Border.all()
-                          ),
-                          child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Lidocaine", DateTime.now(), "${dripButtons[3].toStringAsFixed(1)} mcg");
-                                entries.add(add);
-                              });
-                            },
-                            child:Center(
-                              child:Text(
-                              "${(dripButtons[3] * widget.wt * 60 / 4).toStringAsFixed(2)}",
-                              style:TextStyle(fontSize: 30)
-                          )))
-                        )
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]
-          )
-        ),
-      ]
+      children:driptable
     );
 
     //TimeLine code
@@ -1346,7 +475,6 @@ class MainPaneState extends State<MainPane> {
       tiles: tiles,
     ).toList();
     timeline = ListView(children: divided);
-
 
 
     return MaterialApp(
@@ -1415,7 +543,7 @@ class MainPaneState extends State<MainPane> {
                       Container(
                         width:MediaQuery.of(context).size.width*0.7,
                         height: MediaQuery.of(context).size.height*0.825,
-                        child:state == 1 ? medications : driptable
+                        child:state == 1 ? medGV : dripGV
                         ),
                         Container(
                           padding: EdgeInsets.all(20)
@@ -1596,37 +724,3 @@ class TimeLineEntry {
     dosage = d;
   }
 }
-
-/*class Timeline extends StatefulWidget {
-  final Set<TimeLineEntry> entries;
-
-  const Timeline({Key key, this.entries}): super(key: key);
-
-  @override
-  _TimelineState createState() => _TimelineState();
-}
-
-class _TimelineState extends State<Timeline> {
-
-  Set<TimeLineEntry> entries;
-
-  _TimelineState({entries});
-
-  @override
-  Widget build(BuildContext context) {
-
-  }
-}
-
-class Medications extends StatefulWidget {
-  @override
-  _MedicationsState createState() => _MedicationsState();
-}
-
-class _MedicationsState extends State<Medications> {
-
-  @override
-  build(BuildContext context) {
-
-  }
-}*/
