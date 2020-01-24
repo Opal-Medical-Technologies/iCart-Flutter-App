@@ -147,28 +147,28 @@ class _WeightScreenState extends State<WeightScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             weightButtons[0],
-                            weightButtons[1],
-                            weightButtons[2],
                             weightButtons[3],
-                          ])),
-                  Container(
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            weightButtons[4],
-                            weightButtons[5],
                             weightButtons[6],
-                            weightButtons[7],
+                            weightButtons[9],
                           ])),
                   Container(
                       padding: EdgeInsets.all(20),
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            weightButtons[8],
-                            weightButtons[9],
+                            weightButtons[1],
+                            weightButtons[4],
+                            weightButtons[7],
                             weightButtons[10],
+                          ])),
+                  Container(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            weightButtons[2],
+                            weightButtons[5],
+                            weightButtons[8],
                             weightButtons[11],
                           ])),
                 ])
@@ -206,108 +206,196 @@ class MainPaneState extends State<MainPane> {
   @override
   Widget build(BuildContext context) {
     //driptable hard code:
-    medications =
-        GridView.count(childAspectRatio: 1.9, crossAxisCount: 2, children: [
+    
+    medications = 
+        GridView.count(childAspectRatio: 1.9, 
+        crossAxisCount: 2, 
+        mainAxisSpacing: 10,
+        crossAxisSpacing:10,
+        children: [
       //Adenosine (IV)
-      Container(
+        Container(
           decoration: BoxDecoration(
               border: Border.all(
                 width: 3,
               ),
               borderRadius: BorderRadius.all(Radius.circular(20))),
-          child: Column(children: [
-            Text(
-              "Adenosine (IV)",
-              style: TextStyle(fontSize: 30),
-              textAlign: TextAlign.left,
-            ),
-            Text(
-              "3mg/ml",
-              style: TextStyle(fontSize: 20),
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              Container(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                    Text("NOTES"),
-                    Text(
-                      "0.1 mg/kg, 6mg MAX",
-                      style: TextStyle(fontSize: 20),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(mainAxisSize: MainAxisSize.max, children: [
+              Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("", style: TextStyle(fontSize: 8)),
+                            Text("   Adenosine (IV)                     ",
+                              style: TextStyle(fontSize: 30,),
+                              ),
+                            Text("    3 mg/ml",
+                              style: TextStyle(fontSize: 23,),
+                              ),
+                          ],
+                        ),
+                        Icon(
+                          Icons.info_outline,
+                          color: Colors.black,
+                          size: 60
+                        ),
+                      ],
+
                     ),
-                    Text(
-                        "Rapid IV Push \nLower dose for heart transplant \nor central line",
-                        style: TextStyle(fontSize: 16)),
-                  ])),
-              Container(
-                  padding: EdgeInsets.all(10),
-                  child: Column(children: [
-                    Text("RATE (ml/hour)"),
-                    Container(
-                        height: 130,
-                        width: 130,
-                        decoration: BoxDecoration(border: Border.all()),
-                        child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry(
-                                    "Adenosine (IV)",
-                                    DateTime.now(),
-                                    "${widget.weight * 0.1} mg");
-                                entries.add(add);
-                              });
-                            },
-                            child: Center(
-                                child: Text(
-                                    "${(0.1 * widget.weight / 3).toStringAsFixed(2)}",
-                                    style: TextStyle(fontSize: 30)))))
-                  ]))
-            ])
+                  ]
+                  ),
+            ]),
+            Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                      margin: EdgeInsets.only(left: 20),
+                      child: Column(children: [
+                        Text("", style: TextStyle(fontSize: 5)),
+                        Text(
+                          "NOTES",
+                          style: TextStyle(fontSize: 20,),
+                        ),
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "0.1 mg/kg, 6 mg MAX",
+                                style: TextStyle(fontSize: 25,),
+                              ),
+                              Text(
+                                "Rapid IV Push\nLower dose for heart transplant\nor central line",
+                                style: TextStyle(fontSize: 18,),
+                              ),
+                            ])
+                      ])),
+                  Container(
+                      margin: EdgeInsets.only(right: 20),
+                      child: Column(children: [
+                        Text("", style: TextStyle(fontSize: 5)),
+                        Text("RATE (ml/hour)", style: TextStyle(fontSize: 20)),
+                        Container(
+                            height: 110,
+                            width: 130,
+                            decoration: BoxDecoration(border: Border.all()),
+                            child: RaisedButton(
+                                color: Colors.white,
+                                onPressed: () {
+                                  setState(() {
+                                    TimeLineEntry add = TimeLineEntry(
+                                        "Adenosine (IV)",
+                                        DateTime.now(),
+                                        "${20 * widget.weight} mg");
+                                    entries.add(add);
+                                  });
+                                },
+                                child: Center(
+                                    child: Text(
+                                        "${(20 * widget.weight / 100).toStringAsFixed(2)}",
+                                        style: TextStyle(fontSize: 30)))))
+                      ]))
+                ])
           ])),
       //Amiodarone
-      Container(
+     Container(
           decoration: BoxDecoration(
               border: Border.all(
                 width: 3,
               ),
               borderRadius: BorderRadius.all(Radius.circular(20))),
-          child: Column(children: [
-            Text("Amiodarone", style: TextStyle(fontSize: 30)),
-            Text("50 mg/ml", style: TextStyle(fontSize: 20)),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              Container(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                    Text("NOTES"),
-                    Text("5 mg/kg, 190mg", style: TextStyle(fontSize: 20)),
-                    Text("IV Push or infusion\nMonitor ECG, HR, BP",
-                        style: TextStyle(fontSize: 16)),
-                  ])),
-              Container(
-                  padding: EdgeInsets.all(10),
-                  child: Column(children: [
-                    Text("RATE (ml/hour)"),
-                    Container(
-                        height: 130,
-                        width: 130,
-                        decoration: BoxDecoration(border: Border.all()),
-                        child: RaisedButton(
-                            color: Colors.white,
-                            onPressed: () {
-                              setState(() {
-                                TimeLineEntry add = TimeLineEntry("Amiodarone",
-                                    DateTime.now(), "${widget.weight * 5} mg");
-                                entries.add(add);
-                              });
-                            },
-                            child: Center(
-                                child: Text(
-                                    "${(5 * widget.weight / 50).toStringAsFixed(2)}",
-                                    style: TextStyle(fontSize: 30)))))
-                  ]))
-            ])
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(mainAxisSize: MainAxisSize.max, children: [
+              Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("", style: TextStyle(fontSize: 8)),
+                            Text("   Amiodarone                         ",
+                              style: TextStyle(fontSize: 30,),
+                              ),
+                            Text("    50 mg/ml",
+                              style: TextStyle(fontSize: 23,),
+                              ),
+                          ],
+                        ),
+                        Icon(
+                          Icons.info_outline,
+                          color: Colors.black,
+                          size: 60
+                        ),
+                      ],
+
+                    ),
+                  ]
+                  ),
+            ]),
+            Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                      margin: EdgeInsets.only(left: 20),
+                      child: Column(children: [
+                        Text("", style: TextStyle(fontSize: 5)),
+                        Text(
+                          "NOTES",
+                          style: TextStyle(fontSize: 20,),
+                        ),
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "5 mg/kg, 190mg",
+                                style: TextStyle(fontSize: 25,),
+                              ),
+                              Text(
+                                "Slow IV Push\nDilute 1:1 with sterile water",
+                                style: TextStyle(fontSize: 18,),
+                              ),
+                            ])
+                      ])),
+                  Container(
+                      margin: EdgeInsets.only(right: 20),
+                      child: Column(children: [
+                        Text("", style: TextStyle(fontSize: 5)),
+                        Text("RATE (ml/hour)", style: TextStyle(fontSize: 20)),
+                        Container(
+                            height: 110,
+                            width: 130,
+                            decoration: BoxDecoration(border: Border.all()),
+                            child: RaisedButton(
+                                color: Colors.white,
+                                onPressed: () {
+                                  setState(() {
+                                    TimeLineEntry add = TimeLineEntry(
+                                        "Calcium Chloride 10%",
+                                        DateTime.now(),
+                                        "${20 * widget.weight} mg");
+                                    entries.add(add);
+                                  });
+                                },
+                                child: Center(
+                                    child: Text(
+                                        "${(20 * widget.weight / 100).toStringAsFixed(2)}",
+                                        style: TextStyle(fontSize: 30)))))
+                      ]))
+                ])
           ])),
       //Atropine (ETT)
       Container(
@@ -470,10 +558,10 @@ class MainPaneState extends State<MainPane> {
                           children: [
                             Text("", style: TextStyle(fontSize: 8)),
                             Text("   Calcium Chloride 10%        ",
-                              style: TextStyle(fontSize: 30),
+                              style: TextStyle(fontSize: 30,),
                               ),
                             Text("    100 mg/ml",
-                              style: TextStyle(fontSize: 23),
+                              style: TextStyle(fontSize: 23,),
                               ),
                           ],
                         ),
@@ -498,18 +586,18 @@ class MainPaneState extends State<MainPane> {
                         Text("", style: TextStyle(fontSize: 5)),
                         Text(
                           "NOTES",
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(fontSize: 20,),
                         ),
                         Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "20 mg/kg, 760mg",
-                                style: TextStyle(fontSize: 25),
+                                style: TextStyle(fontSize: 25,),
                               ),
                               Text(
                                 "Slow IV Push\nDilute 1:1 with sterile water",
-                                style: TextStyle(fontSize: 18),
+                                style: TextStyle(fontSize: 18,),
                               ),
                             ])
                       ])),
@@ -583,13 +671,21 @@ class MainPaneState extends State<MainPane> {
                                 child: Text(
                                     "${(0.01 * widget.weight / 0.1).toStringAsFixed(2)}",
                                     style: TextStyle(fontSize: 30)))))
-                  ]))
+                              ]))
             ])
           ])),
     ]);
+    
+    
 
     driptable =
-        GridView.count(childAspectRatio: 1.9, crossAxisCount: 2, children: [
+        GridView.count(
+          childAspectRatio: 1.9, 
+          crossAxisCount: 2, 
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          children: 
+          [
       //Dopamine
       Container(
           decoration: BoxDecoration(
@@ -1172,7 +1268,14 @@ class MainPaneState extends State<MainPane> {
 
     return MaterialApp(
         //TODO: fill in the theme
-        theme: ThemeData(fontFamily: 'LatoBlack'),
+        theme: ThemeData(fontFamily: 'LatoBlack',
+        textTheme: TextTheme(
+      body1: TextStyle(),
+      body2: TextStyle(),
+    ).apply(
+
+    ),
+  ),
         home: Scaffold(
             body: Container(
                 constraints: BoxConstraints.expand(
