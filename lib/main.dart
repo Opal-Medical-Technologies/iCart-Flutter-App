@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+// import 'package:true_time/true_time.dart';
+import 'dart:async';
 
 void main() {
   runApp(MaterialApp(home: MyApp()));
@@ -189,6 +191,7 @@ class MainPane extends StatefulWidget {
 }
 
 class MainPaneState extends State<MainPane> {
+  
   double atropine = 0.04;
   int state = 0;
   Set<TimeLineEntry> entries = Set<TimeLineEntry>();
@@ -201,6 +204,28 @@ class MainPaneState extends State<MainPane> {
     //driptable hard code:
 
     //medications hard code:
+  }
+
+  // TIME UPDATE STUFF
+  String _timeString;
+
+  @override
+  void initState() {
+    _timeString = _formatDateTime(DateTime.now());
+    Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    super.initState();
+  }
+
+  void _getTime() {
+    final DateTime now = DateTime.now();
+    final String formattedDateTime = _formatDateTime(now);
+    setState(() {
+      _timeString = formattedDateTime;
+    });
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return DateFormat('kk:mm:ss').format(dateTime);
   }
 
   @override
@@ -1434,8 +1459,8 @@ class MainPaneState extends State<MainPane> {
                                                 color: Colors.black,
                                                 width: 2.5))),
                                     child: Center(
-                                        child: Text(
-                                      "${DateFormat('kk:mm:ss').format(DateTime.now())}",
+                                        child: Text(_timeString,
+                                      //"${DateFormat('kk:mm:ss').format(_currentTime)}",
                                       style: TextStyle(fontSize: 30),
                                     ))),
                                 Container(
