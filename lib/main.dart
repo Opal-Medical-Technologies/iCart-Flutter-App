@@ -414,7 +414,7 @@ class MainPaneState extends State<MainPane> {
         driptable.add(gencard(cards[i]));
       }
       else {
-        medications.add(gencard(cards[i]))
+        medications.add(gencard(cards[i]));
       }
     }
     //driptable hard code:
