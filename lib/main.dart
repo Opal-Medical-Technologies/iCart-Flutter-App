@@ -203,10 +203,7 @@ class _WeightScreenState extends State<WeightScreen> {
 
 class MainPane extends StatefulWidget {
   final int wt;
-  final String hospital;
-  final int fleet;
-  final int cart;
-  MainPane({Key key, @required this.wt, @required this.hospital, @required this.fleet, @required this.cart}) : super(key: key);
+  MainPane({Key key, @required this.wt}) : super(key: key);
   @override
   MainPaneState createState() => MainPaneState();
 }
@@ -219,9 +216,7 @@ class MainPaneState extends State<MainPane> {
   List<Container> medications;
   List<Medcard> cards;
 
-  MainPaneState() {
-    cards = getCards();
-  }
+  MainPaneState() {}
 
 
   Container toButton(double dose, Medcard mc) {//converts double value to a dosage button
@@ -241,11 +236,7 @@ class MainPaneState extends State<MainPane> {
       )
     );
   }
-  //TODO: Create function for filling in the cards list with data from the cloud firestore database
-  List<Medcard> getCards() {
-    return [];
 
-  }
 
   Container gencard(Medcard mc) {//converts Medcard to actual card interface
     if (mc.type == CardType.drip) { //belongs in drip table
@@ -409,14 +400,14 @@ class MainPaneState extends State<MainPane> {
 
   @override
   Widget build(BuildContext context) {
-    for (int i = 0; i < cards.length; ++i) {
+    /*for (int i = 0; i < cards.length; ++i) {
       if (cards[i].type == CardType.drip) {
         driptable.add(gencard(cards[i]));
       }
       else {
         medications.add(gencard(cards[i]));
       }
-    }
+    }*/
     //driptable hard code:
     GridView medGV = GridView.count(
       childAspectRatio: 1.9,
