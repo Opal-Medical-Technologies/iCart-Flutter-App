@@ -212,8 +212,8 @@ class MainPaneState extends State<MainPane> {
   int state = 0; //driptable vs medications
   Set<TimeLineEntry> entries = Set<TimeLineEntry>();
   ListView timeline;
-  List<Container> driptable;
-  List<Container> medications;
+  List<Container> driptable = [];
+  List<Container> medications = [];
   List<Medcard> cards;
 
   MainPaneState() {}
