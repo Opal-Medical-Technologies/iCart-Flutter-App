@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
+/*
+TODO:
+3) compile and debug and make it look nice
+*/
 
 enum CardType {
   medication,
   drip
+}
+
+bool isDigit(String s) {
+  return s == "0"
+      || s == "1"
+      || s == "2"
+      || s == "3"
+      || s == "4"
+      || s == "5"
+      || s == "6"
+      || s == "7"
+      || s == "8"
+      || s == "9";
 }
 
 class Medcard {
@@ -12,9 +31,9 @@ class Medcard {
   String notes;
   CardType type;//medication or driptable
 
-  double concentration; //constant to divide from dosage (mg/ml or mcg/ml)
-  String concentration_units;
-  String dosage_units;
+  String conc_str; //constant to divide from dosage (mg/ml or mcg/ml)
+  double conc_val;
+  String conc_unit; //same unit as first unit in conc_str
   int currDose = 0; //index of current dosage corresponding to dosages list
   bool administered = false; // true if has been administered before
 
@@ -26,7 +45,39 @@ class Medcard {
   double seq_min;
   double seq_max;
 
-  Medcard(this.name, this.notes, this.type, this.concentration_units, this.dosage_units, this.first_dosages, this.seq_dosages, this.first_min, this.first_max, this.seq_min, this.seq_max);
+  Medcard(this.name, this.notes, this.type, this.conc_str, this.first_dosages, this.seq_dosages, this.first_min, this.first_max, this.seq_min, this.seq_max) {
+    double numerator;
+    double denominator;
+
+    var originalString = conc_str;
+    var string = originalString.split("/");
+
+    String numer_str = string[0];
+    String denom_str = string[1];
+
+    for (int i = 0; i < numer_str.length; ++i) {
+      if (!isDigit(numer_str[i])) {
+        this.conc_unit = this.type == CardType.medication ? numer_str.substring(i) : numer_str.substring(i) + "/hour";
+        numerator = double.parse(numer_str.substring(0, i));
+        break;
+      }
+    }
+
+    for (int i = 0; i < denom_str.length; ++i) {
+      if (!isDigit(numer_str[i])) {
+        if (i == 0) {
+          denominator =1;
+        }
+        else {
+          numerator = double.parse(numer_str.substring(0, i));
+        }
+        break;
+      }
+    }
+
+    this.conc_val = numerator / denominator;
+
+  }
 }
 
 class TimeLineEntry {
@@ -62,17 +113,16 @@ class _MainPaneState extends State<MainPane> {
   List<Container> medications = [];
   List<Medcard> cards;
 
-  _MainPaneState(this.wt);
+  _MainPaneState(this.wt) {
+    Medcard card1 = Medcard("Test1", "Test1 notes", CardType.medication, "3mg/ml", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
+    Medcard card2 = Medcard("Test2", "Test2 notes", CardType.drip, "3mg/ml", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
+    cards.add(card1);
+    cards.add(card2);
+  }
 
 
   Container toButton(double dose, Medcard mc) {//converts double value to a dosage button
-    List<double> dosages;
-    if (mc.administered) {
-      dosages = mc.first_dosages;
-    }
-    else {
-      dosages = mc.seq_dosages;
-    }
+    List<double> dosages = mc.administered ? mc.seq_dosages : mc.first_dosages;
     
     return Container(
       padding: EdgeInsets.all(5),
@@ -91,47 +141,116 @@ class _MainPaneState extends State<MainPane> {
     );
   }
 
-  Container gencard(Medcard mc) {//converts Medcard to actual card interface
-    if (mc.type == CardType.drip) { //belongs in drip table
-      Widget titleBlock = Text(
-        "${mc.name}",
-        style: TextStyle(fontSize: 30)
-      );
-      Widget notes = Text(
-        "${mc.notes}",
-        style: TextStyle(fontSize: 20)
-      );
 
-      Widget doseButton = Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            Text("RATE (ml/hour)"),
-            Container(
-              height: 130,
-              width: 130,
-              decoration: BoxDecoration(
-                border: Border.all()
-              ),
-              child: RaisedButton(
-                color: Colors.white,
-                onPressed: () {
-                  setState(() {
-                    TimeLineEntry add = TimeLineEntry("${mc.name}", DateTime.now(), "${mc.dosages[mc.currDose].toStringAsFixed(1)} ${mc.unit}");
-                    entries.add(add);
-                  });
-                },
-                child: Center(
-                  child: Text(
-                    "${(mc.dosages[mc.currDose] * widget.wt * 60 / mc.amount).toStringAsFixed(1)}",
-                    style: TextStyle(fontSize: 30)
-                  )
+  Widget titleBlock(Medcard mc) {
+    return Column(
+      children: [
+          Text(
+            "${mc.name}",
+            style: TextStyle(fontSize: 30)
+          ),
+          Text(
+            "${mc.conc_str}",
+            style: TextStyle(fontSize: 20)
+          ),
+      ]
+    );
+  }
+
+  Widget notesBlock(Medcard mc) {
+    return Column(
+      children: [
+        Text("Notes", style: TextStyle(fontSize: 30)),
+        Text("${mc.notes}", style: TextStyle(fontSize: 20))
+      ]
+    );
+  }
+
+  Widget administerButton(Medcard mc) {
+    String uppertext = mc.type == CardType.medication ? "RATE (mL/hour)" : "RATE (mL)";
+    List<double> dosageList = mc.administered ? mc.seq_dosages : mc.first_dosages;
+    double administerAmount = mc.type == CardType.medication ? dosageList[mc.currDose] * widget.wt : dosageList[mc.currDose] * widget.wt * 60;
+
+    double administerButtonAmount = administerAmount * mc.conc_val;
+
+    if (mc.administered) {
+      if (mc.seq_max != -1 && administerButtonAmount > mc.seq_max) {
+        administerButtonAmount = mc.seq_max;
+      }
+      else if (mc.seq_min != -1 && administerButtonAmount < mc.seq_min) {
+        administerButtonAmount = mc.seq_min;
+      }
+    }
+    else {
+      if (mc.first_max != -1 && administerButtonAmount > mc.first_max) {
+        administerButtonAmount = mc.first_max;
+      }
+      else if (mc.first_min != -1 && administerButtonAmount < mc.first_min) {
+        administerButtonAmount = mc.first_min;
+      }
+    }
+    
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Column(
+        children: <Widget>[
+          Text(uppertext),
+          Container(
+            height: 130,
+            width: 130,
+            decoration: BoxDecoration(
+              border: Border.all()
+            ),
+            child: RaisedButton(
+              color: Colors.white,
+              onPressed: () {
+                setState(() {
+                  TimeLineEntry add = TimeLineEntry("${mc.name}", DateTime.now(), "${administerAmount.toStringAsFixed(1)} ${mc.conc_unit}");
+                  entries.add(add);
+                  mc.administered = true;
+                });
+              },
+              child: Center(
+                child: Text(
+                  "${administerButtonAmount.toStringAsFixed(1)}",
+                  style: TextStyle(fontSize: 30)
                 )
               )
             )
-          ],
-        ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget dosageSelection(Medcard mc) {
+    List<double> dosageList = mc.administered ? mc.seq_dosages : mc.first_dosages;
+    String doseText = mc.type == CardType.medication ? mc.conc_unit + "/kg" : mc.conc_unit + "/kg/min";
+
+    if (dosageList.length == 1) {
+      return Container(
+        child: Text(dosageList[0].toStringAsFixed(1) + " " + doseText)
       );
+    }
+    else {
+      return Container(
+        child: Column(
+          children: [
+            Text("DOSE (" + doseText + ")"),
+            Row(
+              children: new List<Widget>.generate(3, (int index) => toButton(dosageList[index], mc))
+            ),
+            Row(
+              children: new List<Widget>.generate(dosageList.length - 3, (int index) => toButton(dosageList[index + 3], mc))
+            ),
+          ]
+        )
+      );
+    }
+  }
+
+
+  Container gencard(Medcard mc) {//converts Medcard to actual card interface
       return Container(
         decoration: BoxDecoration(
           border: Border.all(
@@ -141,126 +260,36 @@ class _MainPaneState extends State<MainPane> {
         ),
         child: Column(
           children: [
-            titleBlock,
-            notes,
+            titleBlock(mc),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  child: Column(
-                    children: [
-                      Text("DOSE (mcg/kg/min)"),
-                      Row(
-                        children: [
-                          toButton(mc.dosages[0], mc),
-                          toButton(mc.dosages[1], mc),
-                          toButton(mc.dosages[2], mc),
-                        ]
-                      ),
-                      Row(
-                        children: [
-                          toButton(mc.dosages[3], mc),
-                          toButton(mc.dosages[4], mc),
-                          toButton(mc.dosages[5], mc),
-                        ]
-                      ),
-                    ]
-                  )
+                Column(
+                  children: [
+                    dosageSelection(mc),
+                    notesBlock(mc)
+                  ]
                 ),
-                doseButton,
+                administerButton(mc)
               ]
             )
           ]
         )
       );
-    }
-    else {//belongs in medication table
-      Widget titleBlock = Text("${mc.name}",
-        style: TextStyle(fontSize: 30));
-      Widget notes = Text(
-        "${mc.notes}",
-        style: TextStyle(fontSize: 18)
-      );
-      List<Container> buttons = [];
-      for (int i = 0; i < mc.dosages.length; ++i) {
-        buttons.add(toButton(mc.dosages[i], mc));
-      }
-      Widget doseButton = Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            Text("RATE (ml/hour)"),
-            Container(
-              height: 130,
-              width: 130,
-              decoration: BoxDecoration(
-                border: Border.all()
-              ),
-              child: RaisedButton(
-                color: Colors.white,
-                onPressed: () {
-                  setState(() {
-                    TimeLineEntry add = TimeLineEntry("${mc.name}", DateTime.now(), "${mc.dosages[mc.currDose].toStringAsFixed(1)} ${mc.unit}");
-                    entries.add(add);
-                  });
-                },
-                child: Center(
-                  child: Text(
-                    "${(mc.dosages[mc.currDose] * widget.wt / mc.amount).toStringAsFixed(1)}",
-                    style: TextStyle(fontSize: 30)
-                  )
-                )
-              )
-            )
-          ],
-        ),
-      );
-      return Container(
-        decoration: BoxDecoration(
-          border: Border.all(width: 3),
-          borderRadius: BorderRadius.all(
-            Radius.circular(20)
-          )
-        ),
-        child: Column(
-          children: [
-            titleBlock,
-            notes,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children:[
-                      Text("Dose (${mc.unit}/kg)"),
-                      Row(
-                        children:buttons
-                      )
-                    ]
-                  )
-                ),
-                doseButton
-              ]
-            )
-          ]
-        )
-      );
-    }
   }
 
 
 
   @override
   Widget build(BuildContext context) {
-    /*for (int i = 0; i < cards.length; ++i) {
-      if (cards[i].type == CardType.drip) {
-        driptable.add(gencard(cards[i]));
-      }
-      else {
+    for (int i = 0; i < cards.length; ++i) {
+      if (cards[i].type == CardType.medication) {
         medications.add(gencard(cards[i]));
       }
-    }*/
+      else {
+        driptable.add(gencard(cards[i]));
+      }
+    }
     //driptable hard code:
     GridView medGV = GridView.count(
       childAspectRatio: 1.9,
