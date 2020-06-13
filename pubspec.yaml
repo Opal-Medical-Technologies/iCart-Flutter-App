@@ -39,10 +39,10 @@ flutter:
   fonts: 
   - family: LatoBlack
     fonts:
-    - asset: fonts/Lato-Black.ttf
+    - asset: lib/fonts/Lato-Black.ttf
   - family: Lato
     fonts:
-    - asset: fonts/Lato-Regular.ttf
+    - asset: lib/fonts/Lato-Regular.ttf
 
 
   # The following line ensures that the Material Icons font is
