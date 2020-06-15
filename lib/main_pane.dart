@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'dart:convert';
 
-/*
-3) compile and debug and make it look nice
-*/
 
 //SUPER DUMB, change later
 bool complete = false;
@@ -107,6 +105,28 @@ class MainPane extends StatefulWidget {
 }
 
 class _MainPaneState extends State<MainPane> {
+  // TIME UPDATE STUFF
+  String _timeString;
+
+  @override
+  void initState() {
+    _timeString = _formatDateTime(DateTime.now());
+    Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    super.initState();
+  }
+
+  void _getTime() {
+    final DateTime now = DateTime.now();
+    final String formattedDateTime = _formatDateTime(now);
+    setState(() {
+      _timeString = formattedDateTime;
+    });
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return DateFormat('kk:mm:ss').format(dateTime);
+  }
+  
   int wt;
   int state = 0; //driptable vs medications
 
@@ -118,10 +138,15 @@ class _MainPaneState extends State<MainPane> {
   List<Medcard> cards = new List();
 
   _MainPaneState(this.wt) {
+
+    /* Medcard(this.name, this.notes, this.type, this.concStr, this.firstDosages, 
+    this.seqDosages, this.firstMin, this.firstMax, this.seqMin, this.seqMax) */
+
+    // OLD
     Medcard card1 = Medcard("Test1", "Test1 notes", CardType.medication, "3mg/ml", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
     Medcard card2 = Medcard("Test2", "Test2 notes", CardType.drip, "4.0mg/2ml", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
     Medcard card3 = Medcard("Test3", "Test1 notes", CardType.medication, "5mg/ml", [0.3, 0.1, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
-    
+  
     cards.add(card1);
     cards.add(card2);
     cards.add(card3);
@@ -150,18 +175,23 @@ class _MainPaneState extends State<MainPane> {
 
 
   Widget titleBlock(Medcard mc) {
-    return Column(
-      children: [
-          Text(
-            "${mc.name}",
-            style: TextStyle(fontSize: 30)
-          ),
-          Text(
-            "${mc.concStr}",
-            style: TextStyle(fontSize: 20)
-          ),
-      ]
-    );
+    return
+
+    //VERY JANKY
+              Column(
+                // Orients this left within column
+                crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                        Text(
+                          "   ${mc.name}",
+                          style: TextStyle(fontSize: 30)
+                        ),
+                   Text(
+                        "   ${mc.concStr}",
+                        style: TextStyle(fontSize: 20)
+                      ),
+                ]
+              );
   }
 
   Widget notesBlock(Medcard mc) {
@@ -266,6 +296,8 @@ class _MainPaneState extends State<MainPane> {
           borderRadius: (BorderRadius.all(Radius.circular(20)))
         ),
         child: Column(
+          // TEST LINE AXIS ALIGNMENT
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             titleBlock(mc),
             Row(
@@ -542,8 +574,8 @@ class _MainPaneState extends State<MainPane> {
                         )
                       ),
                       child: Center(
-                        child: Text(
-                        "${DateFormat('kk:mm:ss').format(DateTime.now())}",
+                        child: Text(_timeString,
+                        //"${DateFormat('kk:mm:ss').format(DateTime.now())}",
                         style: TextStyle(fontSize: 30),
                       ))
                     ),
