@@ -84,12 +84,6 @@ class _WeightScreenState extends State<WeightScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            appBar: AppBar(
-                title: Center(
-                    child: Text(
-              "Weight",
-              textAlign: TextAlign.center,
-            ))),
             body: Container(
                 child: Stack(children: [
               Positioned(
