@@ -7,6 +7,7 @@ import 'dart:async';
 
 //SUPER DUMB, change later
 bool complete = false;
+int temp;
 
 enum CardType {
   medication,
@@ -143,7 +144,7 @@ class _MainPaneState extends State<MainPane> {
     this.seqDosages, this.firstMin, this.firstMax, this.seqMin, this.seqMax) */
 
     // OLD
-    Medcard card1 = Medcard("Test1", "Test1 notes", CardType.medication, "3mg/ml", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
+    Medcard card1 = Medcard("Test1", "Test1 notes", CardType.medication, "3mg/ml", [0.2], [0.1], 2, 8, 2, 8);
     Medcard card2 = Medcard("Test2", "Test2 notes", CardType.drip, "4.0mg/2ml", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
     Medcard card3 = Medcard("Test3", "Test1 notes", CardType.medication, "5mg/ml", [0.3, 0.1, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
   
@@ -195,10 +196,12 @@ class _MainPaneState extends State<MainPane> {
   }
 
   Widget notesBlock(Medcard mc) {
+    List<double> dosageList = mc.administered ? mc.seqDosages : mc.firstDosages;
     return Column(
       children: [
         Text("Notes", style: TextStyle(fontSize: 30)),
-        Text("${mc.notes}", style: TextStyle(fontSize: 20))
+        dosageList.length == 1 ? Text("${dosageList[0]}") : Container(),
+        Text("${mc.notes}", style: TextStyle(fontSize: 20), textAlign: TextAlign.left,)
       ]
     );
   }
