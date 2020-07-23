@@ -144,13 +144,37 @@ class _MainPaneState extends State<MainPane> {
     this.seqDosages, this.firstMin, this.firstMax, this.seqMin, this.seqMax) */
 
     // OLD
-    Medcard card1 = Medcard("Test1", "Test1 notes", CardType.medication, "3mg/ml", [0.2], [0.1], 2, 8, 2, 8);
-    Medcard card2 = Medcard("Test2", "Test2 notes", CardType.drip, "4.0mg/2ml", [0.2, 0.4, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
-    Medcard card3 = Medcard("Test3", "Test1 notes", CardType.medication, "5mg/ml", [0.3, 0.1, 0.6, 0.8, 1.0, 1.2], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6], 2, 8, 2, 8);
-  
+    Medcard card1 = Medcard("Adenosine", "Rapid IV Push\n" "MUST follow w/ normal saline flush\n" "Monitor ECG", CardType.medication, "3mg/ml", [.3], [.4], -1, 6, -1, 9999);
+    Medcard card2 = Medcard("Amiodarone", "Monitor ECG\n" "IV Push or Infusion", CardType.medication, "50mg/ml", [5], [5], -1, 9999, -1, 9999);
+    Medcard card3 = Medcard("Atropine", "May give IV/IO/ETT\n" "May repeat every 3-5 minutes", CardType.medication, "1mg/ml", [.02], [.02], .1, 1, .1, 1);
+    Medcard card4 = Medcard("Calcium Chloride 10%", "Slow IV Push\n" "Dilute 1:1 w/ sterile water for injection", CardType.medication, "100mg/mL", [20], [20], -1, 9999, -1, 9999);
+    Medcard card5 = Medcard("Dextrose 25%", "Dilute 1:1 w/ sterile water for injection", CardType.medication, "250mg/ml", [.5,.75,1], [.5,.75,1], -1, 9999, -1, 9999);
+    Medcard card6 = Medcard("Epinephrine IV/IO", "May repeat every 3-5 mins", CardType.medication, "1mg/mL", [.01], [.1], -1, 9999, -1, 9999);
+    Medcard card7 = Medcard("Epinephrine ETT", "May repeat every 3-5 mins", CardType.medication, "1mg/mL", [.1], [.1], -1, 9999, -1, 9999);
+    Medcard card8 = Medcard("Lidocaine", "", CardType.medication, "20mg/mL", [1], [1], -1, 9999, -1, 9999);
+    Medcard card9 = Medcard("Magnesium", "Do NOT give IV Push", CardType.medication, "2g/50mL", [25,30,35,40, 45, 50], [25,30,35,40,45,50], -1, 2, -1, 2);
+    Medcard card10 = Medcard("Naloxone", "May repeat every 2-3 min", CardType.medication, '1mg/mL', [2], [2], -1, 9999, -1, 9999);
+    Medcard card11 = Medcard("Sodium Bicarbonate 8.4%", "Dilute 1:1 w/ sterile water for injection", CardType.medication, "1mEq/mL", [1], [1], -1, 9999, -1, 9999);
+    Medcard card12 = Medcard("Dopamine", "", CardType.drip, "400mg/250mL in D5W or NS (1600 mcg/mL)", [2.5,5,7.5,10,15,20], [2.5,5,7.5,10,15,20], -1, 9999, -1, 9999);
+    Medcard card13 = Medcard("Dobutamine", "", CardType.drip, "500mg/250mL in D5W (2000 mcg/mL)", [2.5,5,7.5,10,15,20], [2.5,5,7.5,10,15,20], -1, 9999, -1, 9999);
+    Medcard card14 = Medcard("Epinephrine", "", CardType.drip, "2mg/100mL in D5W or NS (20mcg/mL)", [.1,.2,.4,.5,.8,1], [.1,.2,.4,.5,.8,1], -1, 9999, -1, 9999);
+    Medcard card15 = Medcard("Lidocaine", "In patients with severe CHF: decrease infusion rate", CardType.drip, "2g/500mL in D5W", [20,30,40,50], [20,30,40,50], -1, 9999, -1, 9999);
+
     cards.add(card1);
     cards.add(card2);
     cards.add(card3);
+    cards.add(card4);
+    cards.add(card5);
+    cards.add(card6);
+    cards.add(card7);
+    cards.add(card8);
+    cards.add(card9);
+    cards.add(card10);
+    cards.add(card11);
+    cards.add(card12);
+    cards.add(card13);
+    cards.add(card14);
+    cards.add(card15);
   }
 
 
@@ -196,14 +220,27 @@ class _MainPaneState extends State<MainPane> {
   }
 
   Widget notesBlock(Medcard mc) {
+    if (mc.notes != ""){
     List<double> dosageList = mc.administered ? mc.seqDosages : mc.firstDosages;
-    return Column(
-      children: [
-        Text("Notes", style: TextStyle(fontSize: 30)),
-        dosageList.length == 1 ? Text("${dosageList[0]}") : Container(),
-        Text("${mc.notes}", style: TextStyle(fontSize: 20), textAlign: TextAlign.left,)
+    String doseText = mc.type == CardType.medication ? mc.concUnit + "/kg" : mc.concUnit + "/kg/min";
+    return 
+    Column(
+      children:[
+        Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+        Text("Notes", style: TextStyle(fontSize: 30),),]),
+        Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+        dosageList.length == 1 ? Text(dosageList[0].toStringAsFixed(1) + " " + doseText, style: TextStyle(fontSize: 20),) : Container(),
+        Text("${mc.notes}", style: TextStyle(fontSize: 18),)]),
       ]
     );
+    }
+    else{
+      return Column();
+    }
   }
 
   Widget administerButton(Medcard mc) {
@@ -269,7 +306,7 @@ class _MainPaneState extends State<MainPane> {
 
     if (dosageList.length == 1) {
       return Container(
-        child: Text(dosageList[0].toStringAsFixed(1) + " " + doseText)
+        //child: Text(dosageList[0].toStringAsFixed(1) + " " + doseText)
       );
     }
     else {
