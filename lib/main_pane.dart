@@ -212,7 +212,7 @@ class _MainPaneState extends State<MainPane> {
                           style: TextStyle(fontSize: 30)
                         ),
                    Text(
-                        "   ${mc.concStr}",
+                        "    ${mc.concStr}",
                         style: TextStyle(fontSize: 20)
                       ),
                 ]
@@ -220,22 +220,35 @@ class _MainPaneState extends State<MainPane> {
   }
 
   Widget notesBlock(Medcard mc) {
-    if (mc.notes != ""){
+    if (mc.notes != "" || mc.type == CardType.medication ){
     List<double> dosageList = mc.administered ? mc.seqDosages : mc.firstDosages;
     String doseText = mc.type == CardType.medication ? mc.concUnit + "/kg" : mc.concUnit + "/kg/min";
     return 
+    Container(
+    height : 160,
+    child: Align(
+      alignment: Alignment.topCenter,
+    child:
     Column(
       children:[
         Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
         Text("Notes", style: TextStyle(fontSize: 30),),]),
+        
         Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,      
         children: [
         dosageList.length == 1 ? Text(dosageList[0].toStringAsFixed(1) + " " + doseText, style: TextStyle(fontSize: 20),) : Container(),
-        Text("${mc.notes}", style: TextStyle(fontSize: 18),)]),
+        
+        Container(
+          width: 250,
+        child:
+        Text("${mc.notes}", style: TextStyle(fontSize: 18),))]
+        )
       ]
+    )
+    )
     );
     }
     else{
