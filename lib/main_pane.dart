@@ -225,7 +225,7 @@ class _MainPaneState extends State<MainPane> {
     String doseText = mc.type == CardType.medication ? mc.concUnit + "/kg" : mc.concUnit + "/kg/min";
     return 
     Container(
-    height : 160,
+    //height : 160,
     child: Align(
       alignment: Alignment.topCenter,
     child:
@@ -234,17 +234,17 @@ class _MainPaneState extends State<MainPane> {
         Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-        Text("Notes", style: TextStyle(fontSize: 30),),]),
+        mc.type == CardType.medication ? Text("Notes", style: TextStyle(fontSize: 30),): Container(),]),
         
         Column(
         crossAxisAlignment: CrossAxisAlignment.start,      
         children: [
-        dosageList.length == 1 ? Text(dosageList[0].toStringAsFixed(1) + " " + doseText, style: TextStyle(fontSize: 20),) : Container(),
+        dosageList.length == 1 ? Text(dosageList[0].toStringAsFixed(1) + " " + doseText, style: TextStyle(fontSize: 26),) : Container(),
         
         Container(
           width: 250,
         child:
-        Text("${mc.notes}", style: TextStyle(fontSize: 18),))]
+        mc.type == CardType.medication ? Text("${mc.notes}", style: TextStyle(fontSize: 18),) : Text("*${mc.notes}", style: TextStyle(fontSize: 17),))]
         )
       ]
     )
@@ -280,7 +280,8 @@ class _MainPaneState extends State<MainPane> {
       }
     }
     
-    return Container(
+    return 
+    Container(
       padding: EdgeInsets.all(10),
       child: Column(
         children: <Widget>[
@@ -353,6 +354,8 @@ class _MainPaneState extends State<MainPane> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             titleBlock(mc),
+            Container(
+              height: 166, child:
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -364,6 +367,7 @@ class _MainPaneState extends State<MainPane> {
                 ),
                 administerButton(mc)
               ]
+            )
             )
           ]
         )
