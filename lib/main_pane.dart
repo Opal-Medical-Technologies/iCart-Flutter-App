@@ -435,16 +435,17 @@ class _MainPaneState extends State<MainPane> {
           );
     } else {
       return Container(
+          width: 250,
           child: Column(children: [
-        Text("DOSE (" + doseText + ")"),
-        Row(
-            children: new List<Widget>.generate(
-                3, (int index) => toButton(dosageList[index], mc))),
-        Row(
-            // Test Cases Size 2
-            children: new List<Widget>.generate(dosageList.length - 3,
-                (int index) => toButton(dosageList[index + 3], mc))),
-      ]));
+            Text("DOSE (" + doseText + ")"),
+            Wrap(
+                children: new List<Widget>.generate(
+                    3, (int index) => toButton(dosageList[index], mc))),
+            Row(
+                // Test Cases Size 2
+                children: new List<Widget>.generate(dosageList.length - 3,
+                    (int index) => toButton(dosageList[index + 3], mc))),
+          ]));
     }
   }
 
@@ -489,10 +490,18 @@ class _MainPaneState extends State<MainPane> {
     }
     //driptable hard code:
     GridView medGV = GridView.count(
-        childAspectRatio: 1.9, crossAxisCount: 2, children: medications);
+        childAspectRatio: 1.9,
+        crossAxisCount: 2,
+        mainAxisSpacing: 5,
+        crossAxisSpacing: 10,
+        children: medications);
 
     GridView dripGV = GridView.count(
-        childAspectRatio: 1.9, crossAxisCount: 2, children: driptable);
+        childAspectRatio: 1.9,
+        crossAxisCount: 2,
+        mainAxisSpacing: 5,
+        crossAxisSpacing: 10,
+        children: driptable);
 
     //TimeLine code
     final Iterable<Container> tiles =
@@ -587,9 +596,11 @@ class _MainPaneState extends State<MainPane> {
                               color: Colors.grey[50],
                               border: Border(
                                   left: BorderSide(
-                                color: Colors.black,
+                                color: Colors.red,
                                 width: 2.5,
                               ))),
+
+                          // TO BE FIXED
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -598,7 +609,28 @@ class _MainPaneState extends State<MainPane> {
                                         MediaQuery.of(context).size.width * 0.7,
                                     height: MediaQuery.of(context).size.height *
                                         0.925,
-                                    child: state == 1 ? medGV : dripGV),
+                                    child: ListView(
+                                        padding: const EdgeInsets.all(8),
+                                        children: <Widget>[
+                                          Container(
+                                            height: 50,
+                                            color: Colors.amber[600],
+                                            child: Text('Medications',
+                                                style: TextStyle(
+                                                    fontFamily: 'Selawik')),
+                                          ),
+                                          Container(child: medGV),
+                                          Container(
+                                            height: 50,
+                                            color: Colors.amber[600],
+                                            child: Text('Drip Tables',
+                                                style: TextStyle(
+                                                    fontFamily: 'Selawik')),
+                                          ),
+                                          Container(child: dripGV),
+                                        ])),
+
+                                // state == 1 ? medGV : dripGV),
                                 Container(padding: EdgeInsets.all(20)),
                                 Container(
                                     child: Column(
@@ -650,38 +682,6 @@ class _MainPaneState extends State<MainPane> {
                                                   })))
                                     ]))
                               ]))),
-                  /*Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Container(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          height: MediaQuery.of(context).size.height * 0.1,
-                          decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              border: Border(
-                                  left: BorderSide(
-                                    color: Colors.black,
-                                    width: 2.5,
-                                  ),
-                                  bottom: BorderSide(
-                                      color: Colors.black, width: 5))),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                    padding: EdgeInsets.all(10),
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                    height: MediaQuery.of(context).size.height,
-
-                                    // WEIGHT STUFF
-                                    child: Center(
-                                        child: Text("${widget.wt} kg",
-                                            style: TextStyle(
-                                                fontSize: 35,
-                                                fontFamily: 'Selawik'))))
-                              ]))),
-                  */
                   Positioned(
                       bottom: 0,
                       child: Container(
