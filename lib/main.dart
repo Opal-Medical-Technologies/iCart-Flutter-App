@@ -6,8 +6,7 @@ import 'weight_screen.dart';
 //import 'main_pane.dart';
 
 void main() {
-  runApp(MaterialApp(
-    home:MyApp()));
+  runApp(MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
