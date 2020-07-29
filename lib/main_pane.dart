@@ -280,7 +280,7 @@ class _MainPaneState extends State<MainPane> {
 
     return Container(
         padding: EdgeInsets.all(5),
-        width: MediaQuery.of(context).size.width *.0625,
+        width: MediaQuery.of(context).size.width * .0625,
         height: MediaQuery.of(context).size.height * .05331754,
         child: FlatButton(
           child: Text("$dose",
@@ -395,7 +395,7 @@ class _MainPaneState extends State<MainPane> {
         children: <Widget>[
           Text(uppertext),
           Container(
-              height: MediaQuery.of(context).size.height *.15,
+              height: MediaQuery.of(context).size.height * .15,
               width: MediaQuery.of(context).size.width * .1015625,
               decoration: BoxDecoration(border: Border.all()),
               child: RaisedButton(
@@ -433,13 +433,13 @@ class _MainPaneState extends State<MainPane> {
           );
     } else {
       return Container(
-        width : MediaQuery.of(context).size.width * .1953125,
+          width: MediaQuery.of(context).size.width * .1953125,
           child: Column(children: [
-        Text("DOSE (" + doseText + ")"),
-        Wrap(
-            children: new List<Widget>.generate(
-                dosageList.length, (int index) => toButton(dosageList[index], mc))),
-      ]));
+            Text("DOSE (" + doseText + ")"),
+            Wrap(
+                children: new List<Widget>.generate(dosageList.length,
+                    (int index) => toButton(dosageList[index], mc))),
+          ]));
     }
   }
 
@@ -484,10 +484,18 @@ class _MainPaneState extends State<MainPane> {
     }
     //driptable hard code:
     GridView medGV = GridView.count(
-        childAspectRatio: 1.9, crossAxisCount: 2, crossAxisSpacing: MediaQuery.of(context).size.height * .0118, mainAxisSpacing: MediaQuery.of(context).size.width*.0078, children: medications);
+        childAspectRatio: 1.9,
+        crossAxisCount: 2,
+        crossAxisSpacing: MediaQuery.of(context).size.height * .0118,
+        mainAxisSpacing: MediaQuery.of(context).size.width * .0078,
+        children: medications);
 
     GridView dripGV = GridView.count(
-        childAspectRatio: 1.9, crossAxisCount: 2, crossAxisSpacing: MediaQuery.of(context).size.height * .0118, mainAxisSpacing: MediaQuery.of(context).size.width*.0078, children: driptable);
+        childAspectRatio: 1.9,
+        crossAxisCount: 2,
+        crossAxisSpacing: MediaQuery.of(context).size.height * .0118,
+        mainAxisSpacing: MediaQuery.of(context).size.width * .0078,
+        children: driptable);
 
     //TimeLine code
     final Iterable<Container> tiles =
@@ -539,28 +547,29 @@ class _MainPaneState extends State<MainPane> {
                       alignment: Alignment.topLeft,
                       constraints: BoxConstraints.expand(
                         width: MediaQuery.of(context).size.width * 0.2,
-                        height: MediaQuery.of(context).size.height * 0.925,
+                        height: MediaQuery.of(context).size.height * 0.94,
                       ),
-                      decoration: BoxDecoration(
+                      /* decoration: BoxDecoration(
                           color: Colors.grey[50],
                           border: Border(
                               right: BorderSide(
                             color: Colors.black,
                             width: 5,
                           ))),
+                      */
                       child: Column(children: [
                         Container(
                             width: MediaQuery.of(context).size.width * 0.2,
                             height: MediaQuery.of(context).size.height * 0.1,
                             child: Center(
                                 child: Text(
-                              "Timeline",
+                              "TIMELINE",
                               style: TextStyle(
-                                  fontSize: 35, fontFamily: 'Selawik'),
+                                  fontSize: 35, fontFamily: 'SelawikBold'),
                             ))),
                         Container(
                             width: MediaQuery.of(context).size.width * 0.2,
-                            height: MediaQuery.of(context).size.height * 0.825,
+                            height: MediaQuery.of(context).size.height * 0.84,
                             child: Center(
                               child: timeline,
                             ))
@@ -570,7 +579,7 @@ class _MainPaneState extends State<MainPane> {
                       top: MediaQuery.of(context).size.height * 0,
                       child: Container(
                           width: MediaQuery.of(context).size.width * 0.8,
-                          height: MediaQuery.of(context).size.height * 0.925,
+                          height: MediaQuery.of(context).size.height * 0.94,
                           decoration: BoxDecoration(
                               color: Colors.grey[50],
                               border: Border(
@@ -585,8 +594,8 @@ class _MainPaneState extends State<MainPane> {
                                     width:
                                         MediaQuery.of(context).size.width * 0.7,
                                     height: MediaQuery.of(context).size.height *
-                                        0.925,
-                                    child: state == 1 ? medGV : dripGV),
+                                        0.94,
+                                    child: state == 0 ? medGV : dripGV),
                                 Container(padding: EdgeInsets.all(20)),
                                 Container(
                                     child: Column(
@@ -598,10 +607,21 @@ class _MainPaneState extends State<MainPane> {
                                               quarterTurns: 3,
                                               child: Container(
                                                   child: FlatButton(
-                                                      color: (state == 1)
+                                                      shape: RoundedRectangleBorder(
+                                                          side: BorderSide(
+                                                              color:
+                                                                  Colors.grey),
+                                                          borderRadius: BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(
+                                                                      20.0),
+                                                              topRight:
+                                                                  Radius.circular(
+                                                                      20.0))),
+                                                      color: (state == 0)
                                                           ? Colors.grey
                                                           : Colors.white,
-                                                      textColor: (state == 1)
+                                                      textColor: (state == 0)
                                                           ? Colors.white
                                                           : Colors.black,
                                                       child: Text(
@@ -612,17 +632,28 @@ class _MainPaneState extends State<MainPane> {
                                                                   'Selawik')),
                                                       onPressed: () {
                                                         setState(() {
-                                                          state = 1;
+                                                          state = 0;
                                                         });
                                                       })))),
                                       Container(
                                           child: RotatedBox(
                                               quarterTurns: 3,
                                               child: FlatButton(
-                                                  color: (state == 0)
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(
+                                                          color: Colors.grey),
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(
+                                                                      20.0),
+                                                              topRight: Radius
+                                                                  .circular(
+                                                                      20.0))),
+                                                  color: (state == 1)
                                                       ? Colors.grey
                                                       : Colors.white,
-                                                  textColor: (state == 0)
+                                                  textColor: (state == 1)
                                                       ? Colors.white
                                                       : Colors.black,
                                                   child: Text(
@@ -633,7 +664,7 @@ class _MainPaneState extends State<MainPane> {
                                                               'Selawik')),
                                                   onPressed: () {
                                                     setState(() {
-                                                      state = 0;
+                                                      state = 1;
                                                     });
                                                   })))
                                     ]))
@@ -673,12 +704,14 @@ class _MainPaneState extends State<MainPane> {
                       bottom: 0,
                       child: Container(
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * 0.075,
+                          height: MediaQuery.of(context).size.height * 0.06,
+                          // color: Colors.grey, //red[900],
                           decoration: BoxDecoration(
                               color: Colors.grey[50],
                               border: Border(
                                   top: BorderSide(
                                       color: Colors.black, width: 5))),
+                          // */
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -691,12 +724,15 @@ class _MainPaneState extends State<MainPane> {
                                             right: BorderSide(
                                                 color: Colors.black,
                                                 width: 2.5))),
+                                    // */
                                     child: Center(
                                         child: Text(
                                       _timeString,
                                       //"${DateFormat('kk:mm:ss').format(DateTime.now())}",
                                       style: TextStyle(
-                                          fontSize: 30, fontFamily: 'Selawik'),
+                                          fontSize: 28,
+                                          fontFamily: 'SelawikSemiBold',
+                                          color: Colors.black),
                                     ))),
                                 Container(
                                     width:
@@ -705,18 +741,21 @@ class _MainPaneState extends State<MainPane> {
                                     decoration: BoxDecoration(
                                         border: Border(
                                             left: BorderSide(
-                                              color: Colors.black,
+                                              color: Colors.grey,
                                               width: 2.5,
                                             ),
                                             right: BorderSide(
-                                              color: Colors.black,
+                                              color: Colors.grey,
                                               width: 2.5,
                                             ))),
+                                    // */
                                     child: Center(
                                         child: Text(
                                       "Defibrillation (2 J/kg): ${widget.wt * 2} J",
                                       style: TextStyle(
-                                          fontSize: 30, fontFamily: 'Selawik'),
+                                          fontSize: 28,
+                                          fontFamily: 'SelawikSemiBold',
+                                          color: Colors.black),
                                     ))),
                                 Container(
                                     width:
@@ -727,11 +766,14 @@ class _MainPaneState extends State<MainPane> {
                                             left: BorderSide(
                                                 color: Colors.black,
                                                 width: 2.5))),
+                                    // */
                                     child: Center(
                                         child: Text(
                                       "Cardioversion (Synchronized) (0.5 J/kg): ${widget.wt / 2} J",
                                       style: TextStyle(
-                                          fontSize: 30, fontFamily: 'Selawik'),
+                                          fontSize: 28,
+                                          fontFamily: 'SelawikSemiBold',
+                                          color: Colors.black),
                                     ))),
                               ])))
                 ]))));

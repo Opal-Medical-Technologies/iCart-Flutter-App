@@ -37,12 +37,21 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   fonts: 
-  - family: LatoBlack
+  - family: Selawik
     fonts:
-    - asset: lib/fonts/Lato-Black.ttf
-  - family: Lato
+    - asset: lib/fonts/selawk.ttf
+  - family: SelawikBold
     fonts:
-    - asset: lib/fonts/Lato-Regular.ttf
+    - asset: lib/fonts/selawkb.ttf
+  - family: SelawikLight
+    fonts:
+    - asset: lib/fonts/selawkl.ttf
+  - family: SelawikSemibold
+    fonts:
+    - asset: lib/fonts/selawksb.ttf
+  - family: SelawikSemilight
+    fonts:
+    - asset: lib/fonts/selawksl.ttf
 
 
   # The following line ensures that the Material Icons font is

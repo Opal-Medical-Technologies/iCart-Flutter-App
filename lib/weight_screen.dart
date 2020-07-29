@@ -104,7 +104,7 @@ class _WeightScreenState extends State<WeightScreen> {
               },
               child: Text(
                 "$weight1-$weight2 kg",
-                style: TextStyle(fontSize: 20.0),
+                style: TextStyle(fontSize: 20.0, fontFamily: 'Selawik'),
               )));
     }
   }
