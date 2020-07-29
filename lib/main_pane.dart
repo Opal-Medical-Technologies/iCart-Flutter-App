@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
-//import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'dart:convert';
 
 //SUPER DUMB, change later
 bool complete = false;
@@ -282,11 +280,11 @@ class _MainPaneState extends State<MainPane> {
 
     return Container(
         padding: EdgeInsets.all(5),
-        width: 80,
-        height: 45,
+        width: MediaQuery.of(context).size.width *.0625,
+        height: MediaQuery.of(context).size.height * .05331754,
         child: FlatButton(
           child: Text("$dose",
-              style: TextStyle(fontSize: 20, fontFamily: 'Selawik')),
+              style: TextStyle(fontSize: 19.1, fontFamily: 'Selawik')),
           color: (dosages[mc.currDose] == dose) ? Colors.grey : Colors.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
@@ -347,7 +345,7 @@ class _MainPaneState extends State<MainPane> {
                         )
                       : Container(),
                   Container(
-                      width: 250,
+                      width: MediaQuery.of(context).size.width * .1953125,
                       child: mc.type == CardType.medication
                           ? Text(
                               "${mc.notes}",
@@ -397,8 +395,8 @@ class _MainPaneState extends State<MainPane> {
         children: <Widget>[
           Text(uppertext),
           Container(
-              height: 130,
-              width: 130,
+              height: MediaQuery.of(context).size.height *.15,
+              width: MediaQuery.of(context).size.width * .1015625,
               decoration: BoxDecoration(border: Border.all()),
               child: RaisedButton(
                   color: Colors.white,
@@ -435,17 +433,13 @@ class _MainPaneState extends State<MainPane> {
           );
     } else {
       return Container(
-          width: 250,
+        width : MediaQuery.of(context).size.width * .1953125,
           child: Column(children: [
-            Text("DOSE (" + doseText + ")"),
-            Wrap(
-                children: new List<Widget>.generate(
-                    3, (int index) => toButton(dosageList[index], mc))),
-            Row(
-                // Test Cases Size 2
-                children: new List<Widget>.generate(dosageList.length - 3,
-                    (int index) => toButton(dosageList[index + 3], mc))),
-          ]));
+        Text("DOSE (" + doseText + ")"),
+        Wrap(
+            children: new List<Widget>.generate(
+                dosageList.length, (int index) => toButton(dosageList[index], mc))),
+      ]));
     }
   }
 
@@ -454,7 +448,7 @@ class _MainPaneState extends State<MainPane> {
     return Container(
         decoration: BoxDecoration(
             border: Border.all(
-              width: 3,
+              width: MediaQuery.of(context).size.width * .00234375,
             ),
             borderRadius: (BorderRadius.all(Radius.circular(20)))),
         child: Column(
@@ -463,7 +457,7 @@ class _MainPaneState extends State<MainPane> {
             children: [
               titleBlock(mc),
               Container(
-                  height: 166,
+                  height: MediaQuery.of(context).size.height * .19668246,
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -490,18 +484,10 @@ class _MainPaneState extends State<MainPane> {
     }
     //driptable hard code:
     GridView medGV = GridView.count(
-        childAspectRatio: 1.9,
-        crossAxisCount: 2,
-        mainAxisSpacing: 5,
-        crossAxisSpacing: 10,
-        children: medications);
+        childAspectRatio: 1.9, crossAxisCount: 2, crossAxisSpacing: MediaQuery.of(context).size.height * .0118, mainAxisSpacing: MediaQuery.of(context).size.width*.0078, children: medications);
 
     GridView dripGV = GridView.count(
-        childAspectRatio: 1.9,
-        crossAxisCount: 2,
-        mainAxisSpacing: 5,
-        crossAxisSpacing: 10,
-        children: driptable);
+        childAspectRatio: 1.9, crossAxisCount: 2, crossAxisSpacing: MediaQuery.of(context).size.height * .0118, mainAxisSpacing: MediaQuery.of(context).size.width*.0078, children: driptable);
 
     //TimeLine code
     final Iterable<Container> tiles =
@@ -509,7 +495,7 @@ class _MainPaneState extends State<MainPane> {
       return Container(
           decoration: BoxDecoration(
               border: Border.all(
-                width: 1,
+                width: MediaQuery.of(context).size.width * .00078125,
               ),
               borderRadius: BorderRadius.all(Radius.circular(20))),
           child: ListTile(
@@ -560,16 +546,9 @@ class _MainPaneState extends State<MainPane> {
                           border: Border(
                               right: BorderSide(
                             color: Colors.black,
-                            width: 2.5,
+                            width: 5,
                           ))),
                       child: Column(children: [
-                        Container(
-                            width: MediaQuery.of(context).size.width * 0.2,
-                            height: MediaQuery.of(context).size.height * 0.1,
-                            child: Center(
-                                child: Text("${widget.wt} kg",
-                                    style: TextStyle(
-                                        fontSize: 35, fontFamily: 'Selawik')))),
                         Container(
                             width: MediaQuery.of(context).size.width * 0.2,
                             height: MediaQuery.of(context).size.height * 0.1,
@@ -581,7 +560,7 @@ class _MainPaneState extends State<MainPane> {
                             ))),
                         Container(
                             width: MediaQuery.of(context).size.width * 0.2,
-                            height: MediaQuery.of(context).size.height * 0.725,
+                            height: MediaQuery.of(context).size.height * 0.825,
                             child: Center(
                               child: timeline,
                             ))
@@ -596,11 +575,9 @@ class _MainPaneState extends State<MainPane> {
                               color: Colors.grey[50],
                               border: Border(
                                   left: BorderSide(
-                                color: Colors.red,
+                                color: Colors.black,
                                 width: 2.5,
                               ))),
-
-                          // TO BE FIXED
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -609,28 +586,7 @@ class _MainPaneState extends State<MainPane> {
                                         MediaQuery.of(context).size.width * 0.7,
                                     height: MediaQuery.of(context).size.height *
                                         0.925,
-                                    child: ListView(
-                                        padding: const EdgeInsets.all(8),
-                                        children: <Widget>[
-                                          Container(
-                                            height: 50,
-                                            color: Colors.amber[600],
-                                            child: Text('Medications',
-                                                style: TextStyle(
-                                                    fontFamily: 'Selawik')),
-                                          ),
-                                          Container(child: medGV),
-                                          Container(
-                                            height: 50,
-                                            color: Colors.amber[600],
-                                            child: Text('Drip Tables',
-                                                style: TextStyle(
-                                                    fontFamily: 'Selawik')),
-                                          ),
-                                          Container(child: dripGV),
-                                        ])),
-
-                                // state == 1 ? medGV : dripGV),
+                                    child: state == 1 ? medGV : dripGV),
                                 Container(padding: EdgeInsets.all(20)),
                                 Container(
                                     child: Column(
@@ -643,7 +599,7 @@ class _MainPaneState extends State<MainPane> {
                                               child: Container(
                                                   child: FlatButton(
                                                       color: (state == 1)
-                                                          ? Colors.blue
+                                                          ? Colors.grey
                                                           : Colors.white,
                                                       textColor: (state == 1)
                                                           ? Colors.white
@@ -664,7 +620,7 @@ class _MainPaneState extends State<MainPane> {
                                               quarterTurns: 3,
                                               child: FlatButton(
                                                   color: (state == 0)
-                                                      ? Colors.blue
+                                                      ? Colors.grey
                                                       : Colors.white,
                                                   textColor: (state == 0)
                                                       ? Colors.white
@@ -682,6 +638,37 @@ class _MainPaneState extends State<MainPane> {
                                                   })))
                                     ]))
                               ]))),
+                  /* 
+                  Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          height: MediaQuery.of(context).size.height * 0.1,
+                          decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              border: Border(
+                                  left: BorderSide(
+                                    color: Colors.black,
+                                    width: 2.5,
+                                  ),
+                                  bottom: BorderSide(
+                                      color: Colors.black, width: 5))),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Container(
+                                    padding: EdgeInsets.all(10),
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                    height: MediaQuery.of(context).size.height,
+                                    child: Center(
+                                        child: Text("${widget.wt} kg",
+                                            style: TextStyle(
+                                                fontSize: 35,
+                                                fontFamily: 'Selawik'))))
+                              ]))),
+                  */
                   Positioned(
                       bottom: 0,
                       child: Container(
