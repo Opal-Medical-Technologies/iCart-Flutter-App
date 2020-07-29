@@ -309,9 +309,9 @@ class _MainPaneState extends State<MainPane> {
             // Orients this left within column
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-          Text("   ${mc.name}",
+          Text("  ${mc.name}",
               style: TextStyle(fontSize: 30, fontFamily: 'Selawik')),
-          Text("    ${mc.concStr}",
+          Text("   ${mc.concStr}",
               style: TextStyle(fontSize: 20, fontFamily: 'Selawik')),
         ]);
   }
@@ -332,9 +332,9 @@ class _MainPaneState extends State<MainPane> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       mc.type == CardType.medication
-                          ? Text("Notes",
+                          ? Text("NOTES",
                               style: TextStyle(
-                                  fontSize: 30, fontFamily: 'Selawik'))
+                                  fontSize: 22, fontFamily: 'Selawik'))
                           : Container(),
                     ]),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -393,9 +393,10 @@ class _MainPaneState extends State<MainPane> {
       padding: EdgeInsets.all(10),
       child: Column(
         children: <Widget>[
-          Text(uppertext),
+          Text(uppertext,
+              style: TextStyle(fontSize: 18, fontFamily: 'Selawik')),
           Container(
-              height: MediaQuery.of(context).size.height * .15,
+              height: MediaQuery.of(context).size.height * .145,
               width: MediaQuery.of(context).size.width * .1015625,
               decoration: BoxDecoration(border: Border.all()),
               child: RaisedButton(
@@ -461,7 +462,12 @@ class _MainPaneState extends State<MainPane> {
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Column(children: [dosageSelection(mc), notesBlock(mc)]),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height * .0105),
+                          child: Column(
+                              children: [dosageSelection(mc), notesBlock(mc)]),
+                        ),
                         administerButton(mc)
                       ]))
             ]));
@@ -484,6 +490,11 @@ class _MainPaneState extends State<MainPane> {
     }
     //driptable hard code:
     GridView medGV = GridView.count(
+        //7292020 Mod
+        physics: ScrollPhysics(),
+        shrinkWrap: true,
+        //Mod End
+
         childAspectRatio: 1.9,
         crossAxisCount: 2,
         crossAxisSpacing: MediaQuery.of(context).size.height * .0118,
@@ -491,6 +502,11 @@ class _MainPaneState extends State<MainPane> {
         children: medications);
 
     GridView dripGV = GridView.count(
+        //7292020 Mod
+        physics: ScrollPhysics(),
+        shrinkWrap: true,
+        //Mod End
+
         childAspectRatio: 1.9,
         crossAxisCount: 2,
         crossAxisSpacing: MediaQuery.of(context).size.height * .0118,
@@ -562,6 +578,15 @@ class _MainPaneState extends State<MainPane> {
                             width: MediaQuery.of(context).size.width * 0.2,
                             height: MediaQuery.of(context).size.height * 0.1,
                             child: Center(
+                                child: Text("${widget.wt} kg",
+                                    style: TextStyle(
+                                      fontFamily: 'SelawikSemiBold',
+                                      fontSize: 35,
+                                    )))),
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.2,
+                            height: MediaQuery.of(context).size.height * 0.1,
+                            child: Center(
                                 child: Text(
                               "TIMELINE",
                               style: TextStyle(
@@ -569,7 +594,7 @@ class _MainPaneState extends State<MainPane> {
                             ))),
                         Container(
                             width: MediaQuery.of(context).size.width * 0.2,
-                            height: MediaQuery.of(context).size.height * 0.84,
+                            height: MediaQuery.of(context).size.height * 0.74,
                             child: Center(
                               child: timeline,
                             ))
@@ -595,7 +620,75 @@ class _MainPaneState extends State<MainPane> {
                                         MediaQuery.of(context).size.width * 0.7,
                                     height: MediaQuery.of(context).size.height *
                                         0.94,
-                                    child: state == 0 ? medGV : dripGV),
+                                    child: ListView(
+                                      shrinkWrap: true,
+                                      children: <Widget>[
+                                        Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.05,
+                                          child: Column(
+                                            children: <Widget>[
+                                              Row(
+                                                children: <Widget>[
+                                                  Text("MEDICATIONS ", //janky
+                                                      style: TextStyle(
+                                                        fontSize: 30,
+                                                        fontFamily:
+                                                            'SelawikSemiLight',
+                                                      )),
+                                                  Expanded(
+                                                      child: Divider(
+                                                    color: Colors.black,
+                                                  )),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          child: medGV,
+                                        ),
+                                        Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.025),
+                                        Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.05,
+                                          child: Column(
+                                            children: <Widget>[
+                                              Row(
+                                                children: <Widget>[
+                                                  Text("DRIP TABLES ", //janky
+                                                      style: TextStyle(
+                                                        fontSize: 30,
+                                                        fontFamily:
+                                                            'SelawikSemiLight',
+                                                      )),
+                                                  Expanded(
+                                                      child: Divider(
+                                                    color: Colors.black,
+                                                  )),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          child: dripGV,
+                                        ),
+                                        Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.025),
+                                      ],
+                                    )),
                                 Container(padding: EdgeInsets.all(20)),
                                 Container(
                                     child: Column(
