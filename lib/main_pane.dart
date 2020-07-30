@@ -5,6 +5,7 @@ import 'dart:async';
 //SUPER DUMB, change later
 bool complete = false;
 int temp;
+ScrollController sliverController;
 
 enum CardType { medication, drip }
 
@@ -51,9 +52,7 @@ class Medcard {
     var string = originalString.split("/");
 
     String numerStr = string[0];
-    print(numerStr);
     String denomStr = string[1];
-    print(denomStr);
     for (int i = 0; i < numerStr.length; ++i) {
       if (!isDigit(numerStr[i])) {
         this.concUnit = this.type == CardType.medication
@@ -296,6 +295,7 @@ class _MainPaneState extends State<MainPane> {
               mc.currDose = dosages.indexOf(dose);
               complete = false;
               build(context);
+              print(mc.concVal);
             });
           },
         ));
@@ -340,7 +340,7 @@ class _MainPaneState extends State<MainPane> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   dosageList.length == 1
                       ? Text(
-                          dosageList[0].toStringAsFixed(1) + " " + doseText,
+                          dosageList[0].toStringAsFixed(2) + " " + doseText,
                           style: TextStyle(fontSize: 26, fontFamily: 'Selawik'),
                         )
                       : Container(),
@@ -367,13 +367,11 @@ class _MainPaneState extends State<MainPane> {
     String uppertext =
         mc.type == CardType.medication ? "RATE (mL/hour)" : "RATE (mL)";
     List<double> dosageList = mc.administered ? mc.seqDosages : mc.firstDosages;
-    //print('adminButt');
-    //print(mc.currDose);
     double administerAmount = mc.type == CardType.medication
         ? dosageList[mc.currDose] * widget.wt
         : dosageList[mc.currDose] * widget.wt * 60;
 
-    double administerButtonAmount = administerAmount * mc.concVal;
+    double administerButtonAmount = administerAmount / mc.concVal;
 
     if (mc.administered) {
       if (mc.seqMax != -1 && administerButtonAmount > mc.seqMax) {
@@ -426,8 +424,6 @@ class _MainPaneState extends State<MainPane> {
     String doseText = mc.type == CardType.medication
         ? mc.concUnit + "/kg"
         : mc.concUnit + "/kg/min";
-    // print("DosageSel");
-    // print(mc.currDose);
     if (dosageList.length == 1) {
       return Container(
           //child: Text(dosageList[0].toStringAsFixed(1) + " " + doseText)
@@ -489,11 +485,11 @@ class _MainPaneState extends State<MainPane> {
       complete = true;
     }
     //driptable hard code:
-    GridView medGV = GridView.count(
-        //7292020 Mod
+    SliverGrid medGV = SliverGrid.count(
+        /*//7292020 Mod
         physics: ScrollPhysics(),
         shrinkWrap: true,
-        //Mod End
+        //Mod End */
 
         childAspectRatio: 1.9,
         crossAxisCount: 2,
@@ -501,11 +497,11 @@ class _MainPaneState extends State<MainPane> {
         mainAxisSpacing: MediaQuery.of(context).size.width * .0078,
         children: medications);
 
-    GridView dripGV = GridView.count(
-        //7292020 Mod
+    SliverGrid dripGV = SliverGrid.count(
+        /* //7292020 Mod
         physics: ScrollPhysics(),
         shrinkWrap: true,
-        //Mod End
+        //Mod End */
 
         childAspectRatio: 1.9,
         crossAxisCount: 2,
@@ -620,10 +616,12 @@ class _MainPaneState extends State<MainPane> {
                                         MediaQuery.of(context).size.width * 0.7,
                                     height: MediaQuery.of(context).size.height *
                                         0.94,
-                                    child: ListView(
+                                    child: CustomScrollView(
+                                      controller: sliverController,
                                       shrinkWrap: true,
-                                      children: <Widget>[
-                                        Container(
+                                      slivers: <Widget>[
+                                        SliverToBoxAdapter(
+                                            child: Container(
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
@@ -646,16 +644,16 @@ class _MainPaneState extends State<MainPane> {
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        Container(
-                                          child: medGV,
-                                        ),
-                                        Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.025),
-                                        Container(
+                                        )),
+                                        medGV,
+                                        SliverToBoxAdapter(
+                                            child: Container(
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.025)),
+                                        SliverToBoxAdapter(
+                                            child: Container(
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
@@ -678,15 +676,14 @@ class _MainPaneState extends State<MainPane> {
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        Container(
-                                          child: dripGV,
-                                        ),
-                                        Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.025),
+                                        )),
+                                        dripGV,
+                                        SliverToBoxAdapter(
+                                            child: Container(
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.025)),
                                       ],
                                     )),
                                 Container(padding: EdgeInsets.all(20)),
@@ -756,6 +753,11 @@ class _MainPaneState extends State<MainPane> {
                                                           fontFamily:
                                                               'Selawik')),
                                                   onPressed: () {
+                                                    /*sliverController.animateTo(
+                                                        offset,
+                                                        duration: Duration(
+                                                            milliseconds: 200),
+                                                        curve: Curves.linear);*/
                                                     setState(() {
                                                       state = 1;
                                                     });
