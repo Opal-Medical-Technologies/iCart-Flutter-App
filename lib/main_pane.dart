@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
+import 'dart:core';
 
 //SUPER DUMB, change later
 bool complete = false;
@@ -651,6 +652,7 @@ class _MainPaneState extends State<MainPane> {
                                                 height: MediaQuery.of(context)
                                                         .size
                                                         .height *
+                                                    0 *
                                                     0.025)),
                                         SliverToBoxAdapter(
                                             child: Container(
@@ -683,6 +685,7 @@ class _MainPaneState extends State<MainPane> {
                                                 height: MediaQuery.of(context)
                                                         .size
                                                         .height *
+                                                    0 *
                                                     0.025)),
                                       ],
                                     )),
@@ -721,6 +724,15 @@ class _MainPaneState extends State<MainPane> {
                                                               fontFamily:
                                                                   'Selawik')),
                                                       onPressed: () {
+                                                        print('Press');
+                                                        sliverController.animateTo(
+                                                            0,
+                                                            duration: Duration(
+                                                                milliseconds:
+                                                                    200),
+                                                            curve:
+                                                                Curves.linear);
+                                                        print('ed');
                                                         setState(() {
                                                           state = 0;
                                                         });
@@ -753,11 +765,24 @@ class _MainPaneState extends State<MainPane> {
                                                           fontFamily:
                                                               'Selawik')),
                                                   onPressed: () {
-                                                    /*sliverController.animateTo(
-                                                        offset,
+                                                    print("drippress");
+                                                    sliverController.animateTo(
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            (0.05 +
+                                                                (.19668246 *
+                                                                    (medications.length /
+                                                                            2)
+                                                                        .ceil()) +
+                                                                .0078 *
+                                                                    ((medications.length /
+                                                                                2)
+                                                                            .ceil() -
+                                                                        1)),
                                                         duration: Duration(
                                                             milliseconds: 200),
-                                                        curve: Curves.linear);*/
+                                                        curve: Curves.linear);
                                                     setState(() {
                                                       state = 1;
                                                     });
