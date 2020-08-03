@@ -30,7 +30,8 @@ class Medcard {
 
   String concStr; //constant to divide from dosage (mg/ml or mcg/ml)
   double concVal;
-  String concUnit; //same unit as first unit in concStr
+  String concUnit;
+  String concFormulaStr; //same unit as first unit in concStr
   int currDose = 0; //index of current dosage corresponding to dosages list
   bool administered = false; // true if has been administered before
 
@@ -45,26 +46,27 @@ class Medcard {
   double seqMax;
 
   Medcard(this.name, this.notes, this.type, this.concStr, this.firstDosages,
-      this.seqDosages, this.firstMin, this.firstMax, this.seqMin, this.seqMax) {
+      this.seqDosages, this.firstMin, this.firstMax, this.seqMin, this.seqMax, this.concFormulaStr) {
     double numerator;
     double denominator;
 
-    var originalString = concStr;
+    var originalString = concFormulaStr;
     var string = originalString.split("/");
 
     String numerStr = string[0];
     String denomStr = string[1];
     for (int i = 0; i < numerStr.length; ++i) {
-      if (!isDigit(numerStr[i])) {
+      if ((!isDigit(numerStr[i])) & (numerStr[i] != ".")) {
         this.concUnit = this.type == CardType.medication
             ? numerStr.substring(i)
-            : numerStr.substring(i) + "/hour";
+            : numerStr.substring(i);
         numerator = double.parse(numerStr.substring(0, i));
         break;
       }
     }
+
     for (int i = 0; i < denomStr.length; ++i) {
-      if (!isDigit(denomStr[i])) {
+      if ((!isDigit(denomStr[i])) & (denomStr[i] != ".")) {
         if (i == 0) {
           denominator = 1;
         } else {
@@ -146,9 +148,10 @@ class _MainPaneState extends State<MainPane> {
         -1,
         6,
         -1,
-        9999);
+        9999,
+        "3mg/ml");
     Medcard card2 = Medcard("Amiodarone", "Monitor ECG\n" "IV Push or Infusion",
-        CardType.medication, "50mg/ml", [5], [5], -1, 9999, -1, 9999);
+        CardType.medication, "50mg/ml", [5], [5], -1, 9999, -1, 9999,"50mg/ml");
     Medcard card3 = Medcard(
         "Atropine",
         "May give IV/IO/ETT\n" "May repeat every 3-5 minutes",
@@ -159,7 +162,8 @@ class _MainPaneState extends State<MainPane> {
         .1,
         1,
         .1,
-        1);
+        1,
+        "1mg/ml");
     Medcard card4 = Medcard(
         "Calcium Chloride 10%",
         "Slow IV Push\n" "Dilute 1:1 w/ sterile water for injection",
@@ -170,7 +174,8 @@ class _MainPaneState extends State<MainPane> {
         -1,
         9999,
         -1,
-        9999);
+        9999,
+        "100mg/mL");
     Medcard card5 = Medcard(
         "Dextrose 25%",
         "Dilute 1:1 w/ sterile water for injection",
@@ -181,13 +186,14 @@ class _MainPaneState extends State<MainPane> {
         -1,
         9999,
         -1,
-        9999);
+        9999,
+        ".25 g/ml");
     Medcard card6 = Medcard("Epinephrine IV/IO", "May repeat every 3-5 mins",
-        CardType.medication, "1mg/mL", [.01], [.1], -1, 9999, -1, 9999);
+        CardType.medication, "1mg/mL", [.01], [.1], -1, 9999, -1, 9999, "1mg/mL");
     Medcard card7 = Medcard("Epinephrine ETT", "May repeat every 3-5 mins",
-        CardType.medication, "1mg/mL", [.1], [.1], -1, 9999, -1, 9999);
+        CardType.medication, "1mg/mL", [.1], [.1], -1, 9999, -1, 9999, "1mg/mL");
     Medcard card8 = Medcard("Lidocaine", "", CardType.medication, "20mg/mL",
-        [1], [1], -1, 9999, -1, 9999);
+        [1], [1], -1, 9999, -1, 9999, "20mg/mL");
     Medcard card9 = Medcard(
         "Magnesium",
         "Do NOT give IV Push",
@@ -198,9 +204,10 @@ class _MainPaneState extends State<MainPane> {
         -1,
         2,
         -1,
-        2);
+        2,
+        "2000mg/50mL");
     Medcard card10 = Medcard("Naloxone", "May repeat every 2-3 min",
-        CardType.medication, '1mg/mL', [2], [2], -1, 9999, -1, 9999);
+        CardType.medication, '1mg/mL', [2], [2], -1, 9999, -1, 9999, "1mg/mL");
     Medcard card11 = Medcard(
         "Sodium Bicarbonate 8.4%",
         "Dilute 1:1 w/ sterile water for injection",
@@ -211,7 +218,8 @@ class _MainPaneState extends State<MainPane> {
         -1,
         9999,
         -1,
-        9999);
+        9999,
+        '1mEq/mL');
     Medcard card12 = Medcard(
         "Dopamine",
         "",
@@ -222,7 +230,8 @@ class _MainPaneState extends State<MainPane> {
         -1,
         9999,
         -1,
-        9999);
+        9999,
+        "1600 mcg/mL");
     Medcard card13 = Medcard(
         "Dobutamine",
         "",
@@ -233,7 +242,8 @@ class _MainPaneState extends State<MainPane> {
         -1,
         9999,
         -1,
-        9999);
+        9999,
+        "2000 mcg/mL");
     Medcard card14 = Medcard(
         "Epinephrine",
         "",
@@ -244,18 +254,20 @@ class _MainPaneState extends State<MainPane> {
         -1,
         9999,
         -1,
-        9999);
+        9999,
+        "20 mcg/ mL");
     Medcard card15 = Medcard(
         "Lidocaine",
         "In patients with severe CHF: decrease infusion rate",
         CardType.drip,
-        "2g/500mL in D5W",
+        "2g/500mL in D5W (4mg/mL; .04%)",
         [20, 30, 40, 50],
         [20, 30, 40, 50],
         -1,
         9999,
         -1,
-        9999);
+        9999,
+        "4000 mcg/mL");
 
     cards.add(card1);
     cards.add(card2);
@@ -311,7 +323,7 @@ class _MainPaneState extends State<MainPane> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
           Text("  ${mc.name}",
-              style: TextStyle(fontSize: 30, fontFamily: 'Selawik')),
+              style: TextStyle(fontSize: 35, fontFamily: 'Selawik')),
           Text("   ${mc.concStr}",
               style: TextStyle(fontSize: 20, fontFamily: 'Selawik')),
         ]);
@@ -366,7 +378,7 @@ class _MainPaneState extends State<MainPane> {
 
   Widget administerButton(Medcard mc) {
     String uppertext =
-        mc.type == CardType.medication ? "RATE (mL/hour)" : "RATE (mL)";
+        mc.type == CardType.drip ? "RATE (mL/hour)" : "RATE (mL)";
     List<double> dosageList = mc.administered ? mc.seqDosages : mc.firstDosages;
     double administerAmount = mc.type == CardType.medication
         ? dosageList[mc.currDose] * widget.wt
@@ -397,7 +409,7 @@ class _MainPaneState extends State<MainPane> {
           Container(
               height: MediaQuery.of(context).size.height * .145,
               width: MediaQuery.of(context).size.width * .1015625,
-              decoration: BoxDecoration(border: Border.all()),
+              decoration: BoxDecoration(border: Border.all(),),
               child: RaisedButton(
                   color: Colors.white,
                   onPressed: () {
@@ -405,7 +417,7 @@ class _MainPaneState extends State<MainPane> {
                       TimeLineEntry add = TimeLineEntry(
                           "${mc.name}",
                           DateTime.now(),
-                          "${administerAmount.toStringAsFixed(1)} ${mc.concUnit}");
+                          "${administerAmount.toStringAsFixed(0)} ${mc.concUnit}");
                       entries.add(add);
                       mc.administered = true;
                     });
@@ -414,7 +426,7 @@ class _MainPaneState extends State<MainPane> {
                       child: Text(
                           "${administerButtonAmount.toStringAsFixed(1)}",
                           style:
-                              TextStyle(fontSize: 30, fontFamily: 'Selawik')))))
+                              TextStyle(fontSize: 35, fontFamily: 'Selawik')))))
         ],
       ),
     );
@@ -578,7 +590,7 @@ class _MainPaneState extends State<MainPane> {
                                 child: Text("${widget.wt} kg",
                                     style: TextStyle(
                                       fontFamily: 'SelawikSemiBold',
-                                      fontSize: 35,
+                                      fontSize: 55,
                                     )))),
                         Container(
                             width: MediaQuery.of(context).size.width * 0.2,
