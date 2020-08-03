@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:core';
 
 //SUPER DUMB, change later
+final medKey = new GlobalKey();
+final dripKey = new GlobalKey();
 bool complete = false;
 int temp;
 ScrollController sliverController;
@@ -643,7 +645,8 @@ class _MainPaneState extends State<MainPane> {
                                             children: <Widget>[
                                               Row(
                                                 children: <Widget>[
-                                                  Text("MEDICATIONS ", //janky
+                                                  Text("MEDICATIONS ", 
+                                                      key: medKey,//janky
                                                       style: TextStyle(
                                                         fontSize: 30,
                                                         fontFamily:
@@ -677,6 +680,7 @@ class _MainPaneState extends State<MainPane> {
                                               Row(
                                                 children: <Widget>[
                                                   Text("DRIP TABLES ", //janky
+                                                      key: dripKey,
                                                       style: TextStyle(
                                                         fontSize: 30,
                                                         fontFamily:
@@ -736,19 +740,12 @@ class _MainPaneState extends State<MainPane> {
                                                               fontFamily:
                                                                   'Selawik')),
                                                       onPressed: () {
-                                                        print('Press');
-                                                        sliverController.animateTo(
-                                                            0,
-                                                            duration: Duration(
-                                                                milliseconds:
-                                                                    200),
-                                                            curve:
-                                                                Curves.linear);
-                                                        print('ed');
-                                                        setState(() {
-                                                          state = 0;
-                                                        });
-                                                      })))),
+                                                    Scrollable.ensureVisible(medKey.currentContext);
+                                                    setState(() {
+                                                      state = 0;
+                                                    });
+                                                  }
+                                                      )))),
                                       Container(
                                           child: RotatedBox(
                                               quarterTurns: 3,
@@ -777,24 +774,7 @@ class _MainPaneState extends State<MainPane> {
                                                           fontFamily:
                                                               'Selawik')),
                                                   onPressed: () {
-                                                    print("drippress");
-                                                    sliverController.animateTo(
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            (0.05 +
-                                                                (.19668246 *
-                                                                    (medications.length /
-                                                                            2)
-                                                                        .ceil()) +
-                                                                .0078 *
-                                                                    ((medications.length /
-                                                                                2)
-                                                                            .ceil() -
-                                                                        1)),
-                                                        duration: Duration(
-                                                            milliseconds: 200),
-                                                        curve: Curves.linear);
+                                                    Scrollable.ensureVisible(dripKey.currentContext);
                                                     setState(() {
                                                       state = 1;
                                                     });
