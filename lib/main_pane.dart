@@ -3,13 +3,11 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 import 'dart:core';
 
+import 'testData.dart';
+
 //SUPER DUMB, change later
 final medKey = new GlobalKey();
 final dripKey = new GlobalKey();
-bool complete = false;
-int temp;
-ScrollController sliverController;
-
 enum CardType { medication, drip }
 
 bool isDigit(String s) {
@@ -102,7 +100,6 @@ class MainPane extends StatefulWidget {
 }
 
 class _MainPaneState extends State<MainPane> {
-  // TIME UPDATE STUFF
   String _timeString;
 
   @override
@@ -131,149 +128,10 @@ class _MainPaneState extends State<MainPane> {
   ListView timeline;
   List<Container> driptable = [];
   List<Container> medications = [];
-  List<Medcard> cards = new List();
+  List<Medcard> cards;
 
   _MainPaneState(this.wt) {
-    /* Medcard(this.name, this.notes, this.type, this.concStr, this.firstDosages, 
-    this.seqDosages, this.firstMin, this.firstMax, this.seqMin, this.seqMax) */
-
-    // OLD
-    Medcard card1 = Medcard(
-        "Adenosine",
-        "Rapid IV Push\n" "MUST follow w/ normal saline flush\n" "Monitor ECG",
-        CardType.medication,
-        "3mg/ml",
-        [.3],
-        [.4],
-        -1,
-        6,
-        -1,
-        9999);
-    Medcard card2 = Medcard("Amiodarone", "Monitor ECG\n" "IV Push or Infusion",
-        CardType.medication, "50mg/ml", [5], [5], -1, 9999, -1, 9999);
-    Medcard card3 = Medcard(
-        "Atropine",
-        "May give IV/IO/ETT\n" "May repeat every 3-5 minutes",
-        CardType.medication,
-        "1mg/ml",
-        [.02],
-        [.02],
-        .1,
-        1,
-        .1,
-        1);
-    Medcard card4 = Medcard(
-        "Calcium Chloride 10%",
-        "Slow IV Push\n" "Dilute 1:1 w/ sterile water for injection",
-        CardType.medication,
-        "100mg/mL",
-        [20],
-        [20],
-        -1,
-        9999,
-        -1,
-        9999);
-    Medcard card5 = Medcard(
-        "Dextrose 25%",
-        "Dilute 1:1 w/ sterile water for injection",
-        CardType.medication,
-        "250mg/ml",
-        [.5, .75, 1],
-        [.5, .75, 1],
-        -1,
-        9999,
-        -1,
-        9999);
-    Medcard card6 = Medcard("Epinephrine IV/IO", "May repeat every 3-5 mins",
-        CardType.medication, "1mg/mL", [.01], [.1], -1, 9999, -1, 9999);
-    Medcard card7 = Medcard("Epinephrine ETT", "May repeat every 3-5 mins",
-        CardType.medication, "1mg/mL", [.1], [.1], -1, 9999, -1, 9999);
-    Medcard card8 = Medcard("Lidocaine", "", CardType.medication, "20mg/mL",
-        [1], [1], -1, 9999, -1, 9999);
-    Medcard card9 = Medcard(
-        "Magnesium",
-        "Do NOT give IV Push",
-        CardType.medication,
-        "2g/50mL",
-        [25, 30, 35, 40, 45, 50],
-        [25, 30, 35, 40, 45, 50],
-        -1,
-        2,
-        -1,
-        2);
-    Medcard card10 = Medcard("Naloxone", "May repeat every 2-3 min",
-        CardType.medication, '1mg/mL', [2], [2], -1, 9999, -1, 9999);
-    Medcard card11 = Medcard(
-        "Sodium Bicarbonate 8.4%",
-        "Dilute 1:1 w/ sterile water for injection",
-        CardType.medication,
-        "1mEq/mL",
-        [1],
-        [1],
-        -1,
-        9999,
-        -1,
-        9999);
-    Medcard card12 = Medcard(
-        "Dopamine",
-        "",
-        CardType.drip,
-        "400mg/250mL in D5W or NS (1600 mcg/mL)",
-        [2.5, 5, 7.5, 10, 15, 20],
-        [2.5, 5, 7.5, 10, 15, 20],
-        -1,
-        9999,
-        -1,
-        9999);
-    Medcard card13 = Medcard(
-        "Dobutamine",
-        "",
-        CardType.drip,
-        "500mg/250mL in D5W (2000 mcg/mL)",
-        [2.5, 5, 7.5, 10, 15, 20],
-        [2.5, 5, 7.5, 10, 15, 20],
-        -1,
-        9999,
-        -1,
-        9999);
-    Medcard card14 = Medcard(
-        "Epinephrine",
-        "",
-        CardType.drip,
-        "2mg/100mL in D5W or NS (20mcg/mL)",
-        [.1, .2, .4, .5, .8, 1],
-        [.1, .2, .4, .5, .8, 1],
-        -1,
-        9999,
-        -1,
-        9999);
-    Medcard card15 = Medcard(
-        "Lidocaine",
-        "In patients with severe CHF: decrease infusion rate",
-        CardType.drip,
-        "2g/500mL in D5W",
-        [20, 30, 40, 50],
-        [20, 30, 40, 50],
-        -1,
-        9999,
-        -1,
-        9999);
-
-    cards.add(card1);
-    cards.add(card2);
-    cards.add(card3);
-    cards.add(card4);
-    cards.add(card5);
-    cards.add(card6);
-    cards.add(card7);
-    cards.add(card8);
-    cards.add(card9);
-    cards.add(card10);
-    cards.add(card11);
-    cards.add(card12);
-    cards.add(card13);
-    cards.add(card14);
-    cards.add(card15);
+    cards = TEST_CARD_LIST;
   }
 
   Container toButton(double dose, Medcard mc) {
@@ -296,9 +154,6 @@ class _MainPaneState extends State<MainPane> {
           onPressed: () {
             setState(() {
               mc.currDose = dosages.indexOf(dose);
-              complete = false;
-              build(context);
-              print(mc.concVal);
             });
           },
         ));
@@ -482,19 +337,16 @@ class _MainPaneState extends State<MainPane> {
 
   @override
   Widget build(BuildContext context) {
-    if (!complete) {
-      //JANKY
-      medications = [];
-      driptable = [];
-      for (int i = 0; i < cards.length; ++i) {
-        if (cards[i].type == CardType.medication) {
-          medications.add(gencard(cards[i]));
-        } else {
-          driptable.add(gencard(cards[i]));
-        }
+    medications = [];
+    driptable = [];
+    for (int i = 0; i < cards.length; ++i) {
+      if (cards[i].type == CardType.medication) {
+        medications.add(gencard(cards[i]));
+      } else {
+        driptable.add(gencard(cards[i]));
       }
-      complete = true;
     }
+
     //driptable hard code:
     SliverGrid medGV = SliverGrid.count(
         /*//7292020 Mod
@@ -629,7 +481,7 @@ class _MainPaneState extends State<MainPane> {
                                     height: MediaQuery.of(context).size.height *
                                         0.94,
                                     child: CustomScrollView(
-                                      controller: sliverController,
+                                      controller: new ScrollController(),
                                       shrinkWrap: true,
                                       slivers: <Widget>[
                                         SliverToBoxAdapter(
@@ -736,9 +588,11 @@ class _MainPaneState extends State<MainPane> {
                                                               fontFamily:
                                                                   'Selawik')),
                                                       onPressed: () {
-                                                    Scrollable.ensureVisible(medKey.currentContext);
-                                                    setState(() {
-                                                      state = 0;
+                                                        Scrollable.ensureVisible(
+                                                            medKey
+                                                                .currentContext);
+                                                        setState(() {
+                                                          state = 0;
                                                         });
                                                       })))),
                                       Container(
@@ -769,7 +623,8 @@ class _MainPaneState extends State<MainPane> {
                                                           fontFamily:
                                                               'Selawik')),
                                                   onPressed: () {
-                                                    Scrollable.ensureVisible(dripKey.currentContext);
+                                                    Scrollable.ensureVisible(
+                                                        dripKey.currentContext);
                                                     setState(() {
                                                       state = 1;
                                                     });
