@@ -10,9 +10,10 @@ Medcard card1 = Medcard(
     -1,
     6,
     -1,
-    9999);
+    9999,
+    "3mg/ml");
 Medcard card2 = Medcard("Amiodarone", "Monitor ECG\n" "IV Push or Infusion",
-    CardType.medication, "50mg/ml", [5], [5], -1, 9999, -1, 9999);
+    CardType.medication, "50mg/ml", [5], [5], -1, 9999, -1, 9999, "50mg/ml");
 Medcard card3 = Medcard(
     "Atropine",
     "May give IV/IO/ETT\n" "May repeat every 3-5 minutes",
@@ -23,7 +24,8 @@ Medcard card3 = Medcard(
     .1,
     1,
     .1,
-    1);
+    1,
+    "1mg/ml");
 Medcard card4 = Medcard(
     "Calcium Chloride 10%",
     "Slow IV Push\n" "Dilute 1:1 w/ sterile water for injection",
@@ -34,7 +36,8 @@ Medcard card4 = Medcard(
     -1,
     9999,
     -1,
-    9999);
+    9999,
+    "100mg/mL");
 Medcard card5 = Medcard(
     "Dextrose 25%",
     "Dilute 1:1 w/ sterile water for injection",
@@ -45,13 +48,14 @@ Medcard card5 = Medcard(
     -1,
     9999,
     -1,
-    9999);
+    9999,
+    "0.25 g/ml");
 Medcard card6 = Medcard("Epinephrine IV/IO", "May repeat every 3-5 mins",
-    CardType.medication, "1mg/mL", [.01], [.1], -1, 9999, -1, 9999);
+    CardType.medication, "1mg/mL", [.01], [.1], -1, 9999, -1, 9999, "1mg/mL");
 Medcard card7 = Medcard("Epinephrine ETT", "May repeat every 3-5 mins",
-    CardType.medication, "1mg/mL", [.1], [.1], -1, 9999, -1, 9999);
+    CardType.medication, "1mg/mL", [.1], [.1], -1, 9999, -1, 9999, "1mg/mL");
 Medcard card8 = Medcard("Lidocaine", "", CardType.medication, "20mg/mL", [1],
-    [1], -1, 9999, -1, 9999);
+    [1], -1, 9999, -1, 9999, "20mg/mL");
 Medcard card9 = Medcard(
     "Magnesium",
     "Do NOT give IV Push",
@@ -62,9 +66,10 @@ Medcard card9 = Medcard(
     -1,
     2,
     -1,
-    2);
+    2,
+    "2000mg/50mL");
 Medcard card10 = Medcard("Naloxone", "May repeat every 2-3 min",
-    CardType.medication, '1mg/mL', [2], [2], -1, 9999, -1, 9999);
+    CardType.medication, '1mg/mL', [2], [2], -1, 9999, -1, 9999, "1mg/mL");
 Medcard card11 = Medcard(
     "Sodium Bicarbonate 8.4%",
     "Dilute 1:1 w/ sterile water for injection",
@@ -75,7 +80,8 @@ Medcard card11 = Medcard(
     -1,
     9999,
     -1,
-    9999);
+    9999,
+    '1mEq/mL');
 Medcard card12 = Medcard(
     "Dopamine",
     "",
@@ -86,7 +92,8 @@ Medcard card12 = Medcard(
     -1,
     9999,
     -1,
-    9999);
+    9999,
+    "1600 mcg/mL");
 Medcard card13 = Medcard(
     "Dobutamine",
     "",
@@ -97,7 +104,8 @@ Medcard card13 = Medcard(
     -1,
     9999,
     -1,
-    9999);
+    9999,
+    "2000 mcg/mL");
 Medcard card14 = Medcard(
     "Epinephrine",
     "",
@@ -108,20 +116,22 @@ Medcard card14 = Medcard(
     -1,
     9999,
     -1,
-    9999);
+    9999,
+    "20 mcg/ mL");
 Medcard card15 = Medcard(
     "Lidocaine",
     "In patients with severe CHF: decrease infusion rate",
     CardType.drip,
-    "2g/500mL in D5W",
+    "2g/500mL in D5W (4mg/mL; .04%)",
     [20, 30, 40, 50],
     [20, 30, 40, 50],
     -1,
     9999,
     -1,
-    9999);
+    9999,
+    "4000 mcg/mL");
 
-final List<Medcard> TEST_CARD_LIST = [
+final List<Medcard> testCardList = [
   card1,
   card2,
   card3,
