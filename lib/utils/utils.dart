@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+
+import 'dart:async';
+import 'dart:core';
 
 bool isDigit(String s) {
   return s == "0" ||
@@ -12,6 +16,12 @@ bool isDigit(String s) {
       s == "7" ||
       s == "8" ||
       s == "9";
+}
+
+String currentTime() {
+  final DateTime now = DateTime.now();
+  final String formattedDateTime = DateFormat('kk:mm:ss').format(now);
+  return formattedDateTime;
 }
 
 class SizeConfig {
