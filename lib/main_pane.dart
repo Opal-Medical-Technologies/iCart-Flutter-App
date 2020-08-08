@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'dart:core';
+import 'package:flip_card/flip_card.dart';
 
 import 'testData.dart';
 
 //SUPER DUMB, change later
 final medKey = new GlobalKey();
 final dripKey = new GlobalKey();
+//GlobalKey<FlipCardState> flipKey = new GlobalKey<FlipCardState>();
 enum CardType { medication, drip }
 
 bool isDigit(String s) {
@@ -69,7 +71,7 @@ class Medcard {
       if (!isDigit(numerStr[i]) & (numerStr[i] != ".")) {
         this.concUnit = this.type == CardType.medication
             ? numerStr.substring(i)
-            : numerStr.substring(i) + "/hour";
+            : numerStr.substring(i);
         numerator = double.parse(numerStr.substring(0, i));
         break;
       }
@@ -137,8 +139,8 @@ class _MainPaneState extends State<MainPane> {
 
   Set<TimeLineEntry> entries = Set<TimeLineEntry>();
   ListView timeline;
-  List<Container> driptable = [];
-  List<Container> medications = [];
+  List<FlipCard> driptable = [];
+  List<FlipCard> medications = [];
   List<Medcard> cards;
 
   _MainPaneState(this.wt) {
@@ -182,13 +184,11 @@ class _MainPaneState extends State<MainPane> {
             style: TextStyle(
                 fontSize: 35,
                 fontFamily: 'SelawikSemiBold',
-                color: Colors.white),
+                color: Colors.black),
           ),
           Text("${mc.concStr}",
               style: TextStyle(
-                  fontSize: 22,
-                  fontFamily: 'Selawik',
-                  color: Colors.grey[200])),
+                  fontSize: 22, fontFamily: 'Selawik', color: Colors.black)),
         ]);
   }
 
@@ -241,7 +241,7 @@ class _MainPaneState extends State<MainPane> {
 
   Widget administerButton(Medcard mc) {
     String uppertext =
-        mc.type == CardType.medication ? "RATE (mL/hour)" : "RATE (mL)";
+        mc.type == CardType.drip ? "RATE (mL/hour)" : "RATE (mL)";
     List<double> dosageList = mc.administered ? mc.seqDosages : mc.firstDosages;
     double administerAmount = mc.type == CardType.medication
         ? dosageList[mc.currDose] * widget.wt
@@ -321,8 +321,97 @@ class _MainPaneState extends State<MainPane> {
     }
   }
 
+  FlipCard gencard2(Medcard mc) {
+    return FlipCard(
+        direction: FlipDirection.HORIZONTAL,
+        //key: flipKey,
+        //flipOnTouch: false,
+        front: Container(
+            child: Stack(children: <Widget>[
+          Container(),
+          Container(
+              padding: EdgeInsets.fromLTRB(
+                MediaQuery.of(context).size.width * .01,
+                MediaQuery.of(context).size.width * .005,
+                MediaQuery.of(context).size.width * .01,
+                MediaQuery.of(context).size.width * .002,
+              ),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey[500],
+                      spreadRadius: 0,
+                      blurRadius: 0,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                  border: Border.all(
+                    width: MediaQuery.of(context).size.width * .001,
+                    color: Colors.grey[500],
+                  ),
+                  borderRadius: (BorderRadius.all(Radius.circular(20)))),
+              child: Column(
+                  // TEST LINE AXIS ALIGNMENT
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /* Container(
+                  height: MediaQuery.of(context).size.height * 0.01,
+                  decoration: BoxDecoration(color: Colors.teal)), */
+
+                    titleBlock(mc),
+                    Container(
+                        height: MediaQuery.of(context).size.height * .19668246,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        .0105),
+                                child: Column(children: [
+                                  dosageSelection(mc),
+                                  notesBlock(mc)
+                                ]),
+                              ),
+                              administerButton(mc)
+                            ]))
+                  ])),
+          Container(
+              child: Positioned(
+            top: 0,
+            child: Container(
+              color: Colors.teal,
+            ),
+          )),
+        ])),
+        back: Container(
+          padding: EdgeInsets.fromLTRB(
+            MediaQuery.of(context).size.width * .01,
+            MediaQuery.of(context).size.width * .005,
+            MediaQuery.of(context).size.width * .01,
+            MediaQuery.of(context).size.width * .002,
+          ),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey[500],
+                  spreadRadius: 0,
+                  blurRadius: 0,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+              border: Border.all(
+                width: MediaQuery.of(context).size.width * .001,
+                color: Colors.grey[500],
+              ),
+              borderRadius: (BorderRadius.all(Radius.circular(20)))),
+        ));
+  }
+
   Container gencard(Medcard mc) {
-    return Container(
+    /*return Container(
         decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -354,10 +443,10 @@ class _MainPaneState extends State<MainPane> {
             ),
             child: titleBlock(mc),
           ),
-        ]));
+        ])); */
 
     //converts Medcard to actual card interface
-    /*return Container(
+    return Container(
         child: Stack(children: <Widget>[
       Container(),
       Container(
@@ -368,15 +457,15 @@ class _MainPaneState extends State<MainPane> {
             MediaQuery.of(context).size.width * .002,
           ),
           decoration: BoxDecoration(
-              //color: Colors.white,
-              /*boxShadow: [
+              color: Colors.white,
+              boxShadow: [
                 BoxShadow(
                   color: Colors.grey[500],
                   spreadRadius: 0,
                   blurRadius: 0,
                   offset: Offset(0, 3), // changes position of shadow
                 ),
-              ],*/
+              ],
               border: Border.all(
                 width: MediaQuery.of(context).size.width * .001,
                 color: Colors.grey[500],
@@ -414,7 +503,7 @@ class _MainPaneState extends State<MainPane> {
           color: Colors.teal,
         ),
       )),
-    ]));*/
+    ]));
   }
 
   @override
@@ -423,9 +512,9 @@ class _MainPaneState extends State<MainPane> {
     driptable = [];
     for (int i = 0; i < cards.length; ++i) {
       if (cards[i].type == CardType.medication) {
-        medications.add(gencard(cards[i]));
+        medications.add(gencard2(cards[i]));
       } else {
-        driptable.add(gencard(cards[i]));
+        driptable.add(gencard2(cards[i]));
       }
     }
 

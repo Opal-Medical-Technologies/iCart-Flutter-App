@@ -26,6 +26,8 @@ dependencies:
   true_time: ^0.1.0
   scrollable_positioned_list: ^0.1.7
   intl: ^0.15.7
+  flip_card: ^0.4.4
+
 
 
   # The following adds the Cupertino Icons font to your application.

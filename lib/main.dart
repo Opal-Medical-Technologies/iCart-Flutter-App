@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
 import 'weight_screen.dart';
 
 void main() {
@@ -13,4 +11,3 @@ class MyApp extends StatelessWidget {
     return WeightScreen();
   }
 }
-
