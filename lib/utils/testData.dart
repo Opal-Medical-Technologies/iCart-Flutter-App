@@ -1,6 +1,6 @@
-import 'main_pane.dart';
+import '../dataStructures/medCard.dart';
 
-Medcard card1 = Medcard(
+final Medcard TEST_CARD1 = Medcard(
     "Adenosine",
     "Rapid IV Push\n" "MUST follow w/ normal saline flush\n" "Monitor ECG",
     CardType.medication,
@@ -12,9 +12,19 @@ Medcard card1 = Medcard(
     -1,
     9999,
     "3mg/ml");
-Medcard card2 = Medcard("Amiodarone", "Monitor ECG\n" "IV Push or Infusion",
-    CardType.medication, "50mg/ml", [5], [5], -1, 9999, -1, 9999, "50mg/ml");
-Medcard card3 = Medcard(
+final Medcard TEST_CARD2 = Medcard(
+    "Amiodarone",
+    "Monitor ECG\n" "IV Push or Infusion",
+    CardType.medication,
+    "50mg/ml",
+    [5],
+    [5],
+    -1,
+    9999,
+    -1,
+    9999,
+    "50mg/ml");
+final Medcard TEST_CARD3 = Medcard(
     "Atropine",
     "May give IV/IO/ETT\n" "May repeat every 3-5 minutes",
     CardType.medication,
@@ -26,7 +36,7 @@ Medcard card3 = Medcard(
     .1,
     1,
     "1mg/ml");
-Medcard card4 = Medcard(
+final Medcard TEST_CARD4 = Medcard(
     "Calcium Chloride 10%",
     "Slow IV Push\n" "Dilute 1:1 w/ sterile water for injection",
     CardType.medication,
@@ -38,7 +48,7 @@ Medcard card4 = Medcard(
     -1,
     9999,
     "100mg/mL");
-Medcard card5 = Medcard(
+final Medcard TEST_CARD5 = Medcard(
     "Dextrose 25%",
     "Dilute 1:1 w/ sterile water for injection",
     CardType.medication,
@@ -50,13 +60,33 @@ Medcard card5 = Medcard(
     -1,
     9999,
     "0.25 g/ml");
-Medcard card6 = Medcard("Epinephrine IV/IO", "May repeat every 3-5 mins",
-    CardType.medication, "1mg/mL", [.01], [.1], -1, 9999, -1, 9999, "1mg/mL");
-Medcard card7 = Medcard("Epinephrine ETT", "May repeat every 3-5 mins",
-    CardType.medication, "1mg/mL", [.1], [.1], -1, 9999, -1, 9999, "1mg/mL");
-Medcard card8 = Medcard("Lidocaine", "", CardType.medication, "20mg/mL", [1],
-    [1], -1, 9999, -1, 9999, "20mg/mL");
-Medcard card9 = Medcard(
+final Medcard TEST_CARD6 = Medcard(
+    "Epinephrine IV/IO",
+    "May repeat every 3-5 mins",
+    CardType.medication,
+    "1mg/mL",
+    [.01],
+    [.1],
+    -1,
+    9999,
+    -1,
+    9999,
+    "1mg/mL");
+final Medcard TEST_CARD7 = Medcard(
+    "Epinephrine ETT",
+    "May repeat every 3-5 mins",
+    CardType.medication,
+    "1mg/mL",
+    [.1],
+    [.1],
+    -1,
+    9999,
+    -1,
+    9999,
+    "1mg/mL");
+final Medcard TEST_CARD8 = Medcard("Lidocaine", "", CardType.medication,
+    "20mg/mL", [1], [1], -1, 9999, -1, 9999, "20mg/mL");
+final Medcard TEST_CARD9 = Medcard(
     "Magnesium",
     "Do NOT give IV Push",
     CardType.medication,
@@ -68,9 +98,9 @@ Medcard card9 = Medcard(
     -1,
     2,
     "2000mg/50mL");
-Medcard card10 = Medcard("Naloxone", "May repeat every 2-3 min",
+final Medcard TEST_CARD10 = Medcard("Naloxone", "May repeat every 2-3 min",
     CardType.medication, '1mg/mL', [2], [2], -1, 9999, -1, 9999, "1mg/mL");
-Medcard card11 = Medcard(
+final Medcard TEST_CARD11 = Medcard(
     "Sodium Bicarbonate 8.4%",
     "Dilute 1:1 w/ sterile water for injection",
     CardType.medication,
@@ -82,7 +112,7 @@ Medcard card11 = Medcard(
     -1,
     9999,
     '1mEq/mL');
-Medcard card12 = Medcard(
+final Medcard TEST_CARD12 = Medcard(
     "Dopamine",
     "",
     CardType.drip,
@@ -94,7 +124,7 @@ Medcard card12 = Medcard(
     -1,
     9999,
     "1600 mcg/mL");
-Medcard card13 = Medcard(
+final Medcard TEST_CARD13 = Medcard(
     "Dobutamine",
     "",
     CardType.drip,
@@ -106,7 +136,7 @@ Medcard card13 = Medcard(
     -1,
     9999,
     "2000 mcg/mL");
-Medcard card14 = Medcard(
+final Medcard TEST_CARD14 = Medcard(
     "Epinephrine",
     "",
     CardType.drip,
@@ -118,7 +148,7 @@ Medcard card14 = Medcard(
     -1,
     9999,
     "20 mcg/ mL");
-Medcard card15 = Medcard(
+final Medcard TEST_CARD15 = Medcard(
     "Lidocaine",
     "In patients with severe CHF: decrease infusion rate",
     CardType.drip,
@@ -131,20 +161,20 @@ Medcard card15 = Medcard(
     9999,
     "4000 mcg/mL");
 
-final List<Medcard> testCardList = [
-  card1,
-  card2,
-  card3,
-  card4,
-  card5,
-  card6,
-  card7,
-  card8,
-  card9,
-  card10,
-  card11,
-  card12,
-  card13,
-  card14,
-  card15
+final List<Medcard> TEST_CARD_LIST = [
+  TEST_CARD1,
+  TEST_CARD2,
+  TEST_CARD3,
+  TEST_CARD4,
+  TEST_CARD5,
+  TEST_CARD6,
+  TEST_CARD7,
+  TEST_CARD8,
+  TEST_CARD9,
+  TEST_CARD10,
+  TEST_CARD11,
+  TEST_CARD12,
+  TEST_CARD13,
+  TEST_CARD14,
+  TEST_CARD15
 ];

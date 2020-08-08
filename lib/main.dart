@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'weight_screen.dart';
+import 'UI/weightScreen.dart';
 
 void main() {
   runApp(MaterialApp(home: MyApp()));

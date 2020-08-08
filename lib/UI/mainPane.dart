@@ -1,108 +1,17 @@
-  
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
-import 'dart:core';
 import 'package:flip_card/flip_card.dart';
 
-import 'testData.dart';
+import 'dart:async';
+import 'dart:core';
 
-//SUPER DUMB, change later
+import '../utils/testData.dart';
+import '../dataStructures/medCard.dart';
+import '../dataStructures/timelineEntry.dart';
+
 final medKey = new GlobalKey();
 final dripKey = new GlobalKey();
 //GlobalKey<FlipCardState> flipKey = new GlobalKey<FlipCardState>();
-enum CardType { medication, drip }
-
-bool isDigit(String s) {
-  return s == "0" ||
-      s == "1" ||
-      s == "2" ||
-      s == "3" ||
-      s == "4" ||
-      s == "5" ||
-      s == "6" ||
-      s == "7" ||
-      s == "8" ||
-      s == "9";
-}
-
-class Medcard {
-  String name;
-  String notes;
-  CardType type; //medication or driptable
-
-  String concStr; //constant to divide from dosage (mg/ml or mcg/ml)
-  double concVal;
-  String concUnit; //same unit as first unit in concStr
-  String concFormulaStr; //same unit as first unit in concStr
-  int currDose = 0; //index of current dosage corresponding to dosages list
-  bool administered = false; // true if has been administered before
-
-  List<double>
-      firstDosages; //list of dosages for buttons for first dose (mg/kg or mcg/kg)
-  List<double>
-      seqDosages; //list of dosages for buttons for subsequent dose (mg/kg or mcg/kg)
-
-  double firstMin;
-  double firstMax;
-  double seqMin;
-  double seqMax;
-
-  Medcard(
-      this.name,
-      this.notes,
-      this.type,
-      this.concStr,
-      this.firstDosages,
-      this.seqDosages,
-      this.firstMin,
-      this.firstMax,
-      this.seqMin,
-      this.seqMax,
-      this.concFormulaStr) {
-    double numerator;
-    double denominator;
-
-    var originalString = concFormulaStr;
-    var string = originalString.split("/");
-
-    String numerStr = string[0];
-    String denomStr = string[1];
-    for (int i = 0; i < numerStr.length; ++i) {
-      if (!isDigit(numerStr[i]) & (numerStr[i] != ".")) {
-        this.concUnit = this.type == CardType.medication
-            ? numerStr.substring(i)
-            : numerStr.substring(i);
-        numerator = double.parse(numerStr.substring(0, i));
-        break;
-      }
-    }
-    for (int i = 0; i < denomStr.length; ++i) {
-      if (!isDigit(denomStr[i]) & (numerStr[i] != ".")) {
-        if (i == 0) {
-          denominator = 1;
-        } else {
-          denominator = double.parse(denomStr.substring(0, i));
-        }
-        break;
-      }
-    }
-
-    this.concVal = numerator / denominator;
-  }
-}
-
-class TimeLineEntry {
-  String medication;
-  DateTime time;
-  String dosage;
-
-  TimeLineEntry(String m, DateTime t, String d) {
-    medication = m;
-    time = t;
-    dosage = d;
-  }
-}
 
 class MainPane extends StatefulWidget {
   final int wt;
@@ -145,7 +54,7 @@ class _MainPaneState extends State<MainPane> {
   List<Medcard> cards;
 
   _MainPaneState(this.wt) {
-    cards = testCardList;
+    cards = TEST_CARD_LIST;
   }
 
   Container toButton(double dose, Medcard mc) {
@@ -322,7 +231,7 @@ class _MainPaneState extends State<MainPane> {
     }
   }
 
-  FlipCard gencard2(Medcard mc) {
+  FlipCard genCard(Medcard mc) {
     return FlipCard(
         direction: FlipDirection.HORIZONTAL,
         //key: flipKey,
@@ -513,9 +422,9 @@ class _MainPaneState extends State<MainPane> {
     driptable = [];
     for (int i = 0; i < cards.length; ++i) {
       if (cards[i].type == CardType.medication) {
-        medications.add(gencard2(cards[i]));
+        medications.add(genCard(cards[i]));
       } else {
-        driptable.add(gencard2(cards[i]));
+        driptable.add(genCard(cards[i]));
       }
     }
 
