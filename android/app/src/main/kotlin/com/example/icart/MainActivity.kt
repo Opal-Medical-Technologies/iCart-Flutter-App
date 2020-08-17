@@ -1,4 +1,4 @@
-package com.example.migrated
+package com.example.icart
 
 import io.flutter.embedding.android.FlutterActivity
 
