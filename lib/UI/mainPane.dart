@@ -52,7 +52,7 @@ class _MainPaneState extends State<MainPane> {
       width: MediaQuery.of(context).size.width * .0625,
       height: MediaQuery.of(context).size.height * .05331754,
       child: FlatButton(
-        child: Text("$dose", style: TextStyle(fontSize: 19.1, fontFamily: 'Selawik')),
+        child: Text("$dose", style: TextStyle(fontSize: 13.6, fontFamily: 'Selawik')),
         color: (dosages[mc.currDose] == dose) ? Colors.teal : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0), 
@@ -71,13 +71,17 @@ class _MainPaneState extends State<MainPane> {
   Widget titleBlock(Medcard mc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: [  
         Text(
           "${mc.name}",
-          style: TextStyle(fontSize: 35, fontFamily: 'SelawikSemiBold', color: Colors.black)),
+          style: TextStyle(fontSize: 30, fontFamily: 'SelawikSemiBold', color: Colors.black)),
+        mc.type == CardType.medication ? 
         Text(
           "${mc.concStr}",
-          style: TextStyle(fontSize: 22, fontFamily: 'Selawik', color: Colors.black)),
+          style: TextStyle(fontSize: 22, fontFamily: 'Selawik', color: Colors.black)) : 
+        Text(
+          "${mc.concStr}",
+          style: TextStyle(fontSize: 18, fontFamily: 'Selawik', color: Colors.black))
       ]
     );
   }
@@ -98,17 +102,17 @@ class _MainPaneState extends State<MainPane> {
                 Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      mc.type == CardType.medication
+                      mc.type == CardType.medication && mc.notes != ""
                           ? Text("NOTES",
                               style: TextStyle(
-                                  fontSize: 18, fontFamily: 'SelawikSemiBold'))
+                                  fontSize: 16, fontFamily: 'SelawikSemiBold'))
                           : Container(),
                     ]),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   dosageList.length == 1
                       ? Text(
                           dosageList[0].toStringAsFixed(2) + " " + doseText,
-                          style: TextStyle(fontSize: 26, fontFamily: 'Selawik'),
+                          style: TextStyle(fontSize: 24, fontFamily: 'Selawik'),
                         )
                       : Container(),
                   Container(
@@ -116,12 +120,12 @@ class _MainPaneState extends State<MainPane> {
                       child: mc.type == CardType.medication
                           ? Text(
                               "${mc.notes}",
-                              style: TextStyle(fontSize: 18),
+                              style: TextStyle(fontSize: 16),
                             )
                           : Text(
                               " ${mc.notes}",
                               style: TextStyle(
-                                  fontSize: 18, fontFamily: 'Selawik'),
+                                  fontSize: 16, fontFamily: 'Selawik'),
                             ))
                 ])
               ])));
@@ -155,13 +159,13 @@ class _MainPaneState extends State<MainPane> {
     }
 
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(5),
       child: Column(
         children: <Widget>[
           Text(uppertext,
-              style: TextStyle(fontSize: 18, fontFamily: 'SelawikSemiBold')),
+              style: TextStyle(fontSize: 16, fontFamily: 'SelawikSemiBold')),
           Container(
-              height: MediaQuery.of(context).size.height * .145,
+              height: MediaQuery.of(context).size.height * .12,
               width: MediaQuery.of(context).size.width * .1015625,
               child: RaisedButton(
                   shape: RoundedRectangleBorder(
@@ -204,7 +208,7 @@ class _MainPaneState extends State<MainPane> {
           width: MediaQuery.of(context).size.width * .1953125,
           child: Column(children: [
             Text("DOSE (" + doseText + ")",
-                style: TextStyle(fontFamily: 'SelawikSemiBold', fontSize: 18)),
+                style: TextStyle(fontFamily: 'SelawikSemiBold', fontSize: 15)),
             Wrap(
                 children: new List<Widget>.generate(dosageList.length,
                     (int index) => toButton(dosageList[index], mc))),
@@ -257,14 +261,14 @@ class _MainPaneState extends State<MainPane> {
 
                     titleBlock(mc),
                     Container(
-                        height: MediaQuery.of(context).size.height * .19668246,
+                        height: MediaQuery.of(context).size.height * .15668246,
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
                                 margin: EdgeInsets.only(
                                     top: MediaQuery.of(context).size.height *
-                                        .0105),
+                                        .0035),
                                 child: Column(children: [
                                   dosageSelection(mc),
                                   notesBlock(mc)
@@ -611,7 +615,7 @@ class _MainPaneState extends State<MainPane> {
                       child: Center(
                           child: Text("Defibrillation (2 J/kg): ${widget.wt * 2} J",
                         style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 25,
                             fontFamily: 'SelawikSemiBold',
                             color: Colors.white),
                       ))),
@@ -623,7 +627,7 @@ class _MainPaneState extends State<MainPane> {
                           child: Text(
                         "Cardioversion (Synchronized) (0.5 J/kg): ${widget.wt / 2} J",
                         style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 25,
                             fontFamily: 'SelawikSemiBold',
                             color: Colors.white),
                       ))),

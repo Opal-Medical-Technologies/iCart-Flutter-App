@@ -88,7 +88,7 @@ final Medcard TEST_CARD8 = Medcard("Lidocaine", "", CardType.medication,
     "20mg/mL", [1], [1], -1, 9999, -1, 9999, "20mg/mL");
 final Medcard TEST_CARD9 = Medcard(
     "Magnesium",
-    "Do NOT give IV Push",
+    "",
     CardType.medication,
     "2g/50mL",
     [25, 30, 35, 40, 45, 50],
@@ -150,7 +150,7 @@ final Medcard TEST_CARD14 = Medcard(
     "20 mcg/ mL");
 final Medcard TEST_CARD15 = Medcard(
     "Lidocaine",
-    "In patients with severe CHF: decrease infusion rate",
+    "",
     CardType.drip,
     "2g/500mL in D5W (4mg/mL; .04%)",
     [20, 30, 40, 50],
